@@ -301,7 +301,6 @@ footer a{color:var(--primary-lt);text-decoration:none;}
     <div class="view-btns">
       <button class="view-btn active" id="vb-all" onclick="setView('all')">All</button>
       <button class="view-btn" id="vb-only" onclick="setView('only')">Only selected</button>
-      <button class="view-btn" id="vb-dim" onclick="setView('dim')">Dim others</button>
     </div>
     <button class="clear-filter" onclick="clearAllFilters()">&#10005; Clear filters</button>
   </div>
@@ -541,7 +540,7 @@ let domains=[],cells={};
 // Filter state
 let selGrades=new Set(); // selected grade indices
 let selDomains=new Set(); // selected domain indices (empty = all)
-let viewMode='all'; // 'all'|'only'|'dim'
+let viewMode='all'; // 'all'|'only'
 let neighborMode=false;
 
 function defaultCells(doms){
@@ -641,7 +640,7 @@ function toggleDomain(di){
 
 function setView(v){
   viewMode=v;
-  ['all','only','dim'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x===v));
+  ['all','only'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x===v));
   applyFilters();
 }
 
@@ -650,7 +649,7 @@ function clearAllFilters(){
   viewMode='all';
   document.getElementById('search-input').value='';
   neighborMode=false;
-  ['all','only','dim'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x==='all'));
+  ['all','only'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x==='all'));
   applyFilters();
 }
 
@@ -702,9 +701,8 @@ function applyFilters(){
       const domainFail = selDomains.size>0 && !domainMatch;
       const gradeFail = selGrades.size>0 && !hasInRange;
       const hideRow = searchFail || domainFail || (viewMode==='only' && gradeFail);
-      const dimRow = !hideRow && viewMode==='dim' && gradeFail;
       tr.classList.toggle('row-hidden', hideRow);
-      tr.classList.toggle('row-dimmed', dimRow);
+      tr.classList.remove('row-dimmed');
       // Highlight search term
       const nameEl=tr.querySelector('.t-name-text');
       if(nameEl){

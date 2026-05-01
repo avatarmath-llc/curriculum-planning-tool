@@ -294,6 +294,9 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <button class="btn btn-y" onclick="openExport()">Export JSON</button>
   <button class="btn btn-y" onclick="printView()">&#128438; Print</button>
   <button class="btn btn-r" onclick="resetToDefault()">Reset</button>
+  <div class="t-sep"></div>
+  <button class="btn" id="gh-btn" onclick="openGhModal()" title="Configure GitHub sync">&#9729; Sync</button>
+  <span id="gh-status" style="font-size:10px;color:var(--muted);white-space:nowrap;"></span>
 </div>
 
 <!-- FILTER BAR -->
@@ -394,6 +397,28 @@ footer a{color:var(--primary-lt);text-decoration:none;}
     <div class="modal-actions">
       <button class="btn" onclick="copyExport()">Copy</button>
       <button class="btn" onclick="closeModal('export-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GitHub Sync -->
+<div class="modal-overlay" id="gh-modal">
+  <div class="modal">
+    <h2>&#9729; GitHub Sync</h2>
+    <p style="font-size:11px;color:var(--muted);line-height:1.7">Connect your GitHub account so every Save pushes changes to the shared repo. Changes load automatically for all team members when they open the page.</p>
+    <div><label>Personal Access Token</label><input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off"></div>
+    <div style="background:var(--hint-bg);border-radius:6px;padding:10px 12px;font-size:10px;color:var(--hint-color);line-height:1.8;">
+      <strong>How to get a token:</strong><br>
+      1. GitHub.com → Settings → Developer settings<br>
+      2. Personal access tokens → Fine-grained tokens → Generate new token<br>
+      3. Repository access: <em>Only select repositories</em> → <strong>curriculum-planning-tool</strong><br>
+      4. Repository permissions: <strong>Contents → Read and Write</strong><br>
+      5. Generate token → copy &amp; paste it above
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-r" onclick="clearGhToken()">Disconnect</button>
+      <button class="btn" onclick="closeModal('gh-modal')">Cancel</button>
+      <button class="btn btn-g" onclick="saveGhToken()">Connect</button>
     </div>
   </div>
 </div>
@@ -533,11 +558,68 @@ function defaultCells(doms){
   doms.forEach((d,di)=>d.topics.forEach((t,ti)=>t.g.forEach((v,gi)=>{s[`${di}-${ti}-${gi}`]=v;})));
   return s;
 }
-function load(){
-  try{const s=localStorage.getItem('alc_k12_v4');if(s){const p=JSON.parse(s);domains=p.domains;cells=p.cells;return;}}catch(e){}
-  domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);
+
+/* ══ GITHUB SYNC ══ */
+const GH_OWNER='avatarmath-llc',GH_REPO='curriculum-planning-tool',GH_FILE='data.json';
+const GH_RAW=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
+const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+let ghSyncTimer=null;
+
+function getToken(){try{return localStorage.getItem('gh_token')||'';}catch(e){return '';}}
+
+function openGhModal(){
+  document.getElementById('gh-token-input').value=getToken();
+  document.getElementById('gh-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('gh-token-input').focus(),60);
 }
-function save(){try{localStorage.setItem('alc_k12_v4',JSON.stringify({domains,cells}));}catch(e){}}
+function saveGhToken(){
+  const t=document.getElementById('gh-token-input').value.trim();
+  if(!t){document.getElementById('gh-token-input').focus();return;}
+  try{localStorage.setItem('gh_token',t);}catch(e){}
+  closeModal('gh-modal');
+  updateGhStatus('connected');
+  toast('GitHub connected — changes will sync automatically');
+}
+function clearGhToken(){
+  try{localStorage.removeItem('gh_token');}catch(e){}
+  closeModal('gh-modal');
+  updateGhStatus('');
+  toast('GitHub disconnected');
+}
+function updateGhStatus(state){
+  const btn=document.getElementById('gh-btn');
+  const lbl=document.getElementById('gh-status');
+  if(!btn||!lbl)return;
+  if(state==='connected'){btn.style.color='var(--btn-g-c)';btn.style.borderColor='var(--btn-g-bd)';lbl.textContent='✓ synced';lbl.style.color='var(--btn-g-c)';}
+  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='var(--muted)';}
+  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='var(--btn-g-c)';}
+  else if(state==='error'){lbl.textContent='✕ sync failed — check token';lbl.style.color='var(--btn-r-c)';}
+  else{btn.style.color='';btn.style.borderColor='';lbl.textContent=getToken()?'✓ synced':'';}
+}
+async function syncToGitHub(){
+  const token=getToken();
+  if(!token)return;
+  updateGhStatus('saving');
+  try{
+    let sha=null;
+    const r=await fetch(GH_API,{headers:{Authorization:`token ${token}`,Accept:'application/vnd.github+json'}});
+    if(r.ok){sha=(await r.json()).sha;}
+    const content=JSON.stringify({domains,cells},null,2);
+    const encoded=btoa(unescape(encodeURIComponent(content)));
+    const body={message:'Update curriculum data',content:encoded};
+    if(sha)body.sha=sha;
+    const res=await fetch(GH_API,{method:'PUT',headers:{Authorization:`token ${token}`,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
+    if(res.ok){updateGhStatus('saved');setTimeout(()=>updateGhStatus('connected'),2500);}
+    else{updateGhStatus('error');}
+  }catch(e){updateGhStatus('error');}
+}
+
+/* ══ SAVE ══ */
+function save(){
+  try{localStorage.setItem('alc_k12_v4',JSON.stringify({domains,cells}));}catch(e){}
+  clearTimeout(ghSyncTimer);
+  ghSyncTimer=setTimeout(syncToGitHub,600);
+}
 
 /* ══ FILTER BAR INIT ══ */
 function buildFilterBar(){
@@ -793,7 +875,7 @@ function printView(){
 
 /* ══ MODALS SHARED ══ */
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-['export-modal','confirm-modal','topic-modal','domain-modal'].forEach(id=>{
+['export-modal','confirm-modal','topic-modal','domain-modal','gh-modal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
 });
 
@@ -979,7 +1061,35 @@ function toast(msg){
 }
 
 /* ══ INIT ══ */
-load();buildFilterBar();buildTable();
+async function init(){
+  // Load local state immediately for instant display
+  try{
+    const s=localStorage.getItem('alc_k12_v4');
+    if(s){const p=JSON.parse(s);domains=p.domains;cells=p.cells;}
+    else{domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
+  }catch(e){domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
+  buildFilterBar();buildTable();
+  if(getToken())updateGhStatus('connected');
+
+  // Fetch latest shared state from GitHub in background
+  try{
+    const r=await fetch(GH_RAW+'?t='+Date.now());
+    if(r.ok){
+      const data=await r.json();
+      if(data&&data.domains&&data.cells){
+        const localStr=JSON.stringify({domains,cells});
+        const ghStr=JSON.stringify(data);
+        if(localStr!==ghStr){
+          domains=data.domains;cells=data.cells;
+          try{localStorage.setItem('alc_k12_v4',JSON.stringify({domains,cells}));}catch(e){}
+          buildTable();
+          toast('↻ Synced latest changes from team');
+        }
+      }
+    }
+  }catch(e){}
+}
+init();
 </script>
 </body>
 </html>

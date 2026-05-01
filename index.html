@@ -370,6 +370,7 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="pal-dot" data-type="C" title="Core focus" onclick="pickCellType('C')">&#9679;</div>
   <div class="pal-dot" data-type="M" title="Mastery" onclick="pickCellType('M')">M</div>
   <div class="pal-dot" data-type="R" title="Review" onclick="pickCellType('R')">r</div>
+  <div class="pal-dot" data-type="X" title="Remove" onclick="pickCellType('X')">&#10005;</div>
 </div>
 
 <!-- MODAL: Topic -->
@@ -817,9 +818,11 @@ let pickerKey=null,pickerTd=null;
 function showCellPicker(td,key,e){
   pickerKey=key;pickerTd=td;
   const pk=document.getElementById('cell-picker');
+  const cur=cells[key];
+  pk.querySelectorAll('.pal-dot').forEach(d=>d.classList.toggle('selected',d.dataset.type===cur));
   pk.classList.add('open');
   const rect=td.getBoundingClientRect();
-  const pw=136,ph=40;
+  const pw=168,ph=40;
   let left=rect.left+rect.width/2-pw/2;
   let top=rect.bottom+6;
   if(left<4)left=4;
@@ -830,7 +833,8 @@ function showCellPicker(td,key,e){
 }
 function pickCellType(type){
   if(!pickerKey)return;
-  cells[pickerKey]=type;save();renderCell(pickerTd,type);toast(LABEL[type]);
+  const v=type==='X'?null:type;
+  cells[pickerKey]=v;save();renderCell(pickerTd,v);toast(v?LABEL[v]:'Removed');
   hideCellPicker();
 }
 function hideCellPicker(){
@@ -884,8 +888,6 @@ function buildTable(){
             const v=selectedTool==='X'?null:selectedTool;
             cells[key]=v;save();renderCell(td,v);toast(v?LABEL[v]:'Cleared');
             hideCellPicker();
-          }else if(cells[key]){
-            cells[key]=null;save();renderCell(td,null);toast('Removed');
           }else{
             showCellPicker(td,key,e);
           }

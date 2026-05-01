@@ -40,7 +40,8 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 .toolbar{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .tool-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
 .chips-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
-.class-chip{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:10px;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.class-chip{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:10px;display:flex;align-items:center;gap:5px;white-space:nowrap;cursor:grab;user-select:none;}
+.class-chip:hover{border-color:var(--border2);}
 .chip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .btn{padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:var(--primary);color:white;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:background .15s;white-space:nowrap;}
 .btn:hover{background:#1a4a7a;}
@@ -297,8 +298,11 @@ function render(){
 }
 
 function renderChips(){
+  const usedIds=new Set(sessions.map(s=>s.classId));
   document.getElementById('class-chips').innerHTML=
-    classes.map(c=>`<div class="class-chip"><div class="chip-dot" style="background:${c.color}"></div>${esc(c.name)}</div>`).join('');
+    classes.filter(c=>!usedIds.has(c.id)).map(c=>
+      `<div class="class-chip" onmousedown="chipDown(event,${c.id})"><div class="chip-dot" style="background:${c.color}"></div>${esc(c.name)}</div>`
+    ).join('');
   document.getElementById('teacher-chips').innerHTML=
     teachers.map(t=>`<div class="class-chip">${esc(t.name)}</div>`).join('');
 }
@@ -511,7 +515,7 @@ function mvMove(e){
   mv.ghost.style.left=(e.clientX-mv.offX)+'px';
   mv.ghost.style.top=(e.clientY-mv.offY)+'px';
 
-  const tgt=getDropTarget(e.clientX,e.clientY);
+  const tgt=getDropTarget(e.clientX,e.clientY,mv.s.durationMin);
   mv.targetDay=tgt?.day;mv.targetStart=tgt?.startMin;
   document.querySelectorAll('.drop-target').forEach(el=>el.remove());
   if(tgt){
@@ -546,7 +550,57 @@ function mvUp(){
   render();
 }
 
-function getDropTarget(x,y){
+// ══════════════════════════════════════════
+// CHIP DRAG TO GRID
+// ══════════════════════════════════════════
+let cd=null;
+
+function chipDown(e,classId){
+  e.preventDefault();
+  const cls=classes.find(c=>c.id===classId);
+  if(!cls)return;
+  const g=document.createElement('div');
+  g.className='ghost-block';
+  g.style.cssText=`background:${cls.color};width:130px;left:${e.clientX}px;top:${e.clientY-16}px`;
+  g.innerHTML=`<div class="sb-name">${esc(cls.name)}</div><div class="sb-time">drop to place</div>`;
+  document.body.appendChild(g);
+  cd={classId,cls,ghost:g,targetDay:null,targetStart:null};
+  window.addEventListener('mousemove',chipMove);
+  window.addEventListener('mouseup',chipUp);
+}
+
+function chipMove(e){
+  if(!cd)return;
+  cd.ghost.style.left=(e.clientX-10)+'px';
+  cd.ghost.style.top=(e.clientY-16)+'px';
+  const tgt=getDropTarget(e.clientX,e.clientY,60);
+  cd.targetDay=tgt?.day;cd.targetStart=tgt?.startMin;
+  document.querySelectorAll('.drop-target').forEach(el=>el.remove());
+  if(tgt){
+    const cv=document.getElementById('cv-'+tgt.day);
+    if(cv){
+      const{s:sm,tot}=slotInfo();
+      const ind=document.createElement('div');
+      ind.className='drop-target';
+      ind.style.left=((tgt.startMin-sm)/tot*100).toFixed(3)+'%';
+      ind.style.width=(60/tot*100).toFixed(3)+'%';
+      cv.appendChild(ind);
+    }
+  }
+}
+
+function chipUp(){
+  window.removeEventListener('mousemove',chipMove);
+  window.removeEventListener('mouseup',chipUp);
+  if(cd?.ghost)cd.ghost.remove();
+  document.querySelectorAll('.drop-target').forEach(el=>el.remove());
+  const c=cd;cd=null;
+  if(!c||c.targetDay==null)return;
+  sessions.push({id:nextSid++,day:c.targetDay,classId:c.classId,teacherId:null,startMin:c.targetStart,durationMin:60,lane:0});
+  save();render();toast(`${c.cls.name} placed — click to set teacher/duration`);
+}
+
+function getDropTarget(x,y,durMin=60){
   const{s:startMin,tot}=slotInfo();
   for(const day of DAYS){
     const cv=document.getElementById('cv-'+day);
@@ -555,8 +609,7 @@ function getDropTarget(x,y){
     if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){
       const pct=(x-r.left)/r.width;
       const raw=Math.round(pct*tot/15)*15;
-      const maxStart=tot-(mv?.s?.durationMin||60);
-      return{day,startMin:startMin+Math.max(0,Math.min(raw,maxStart))};
+      return{day,startMin:startMin+Math.max(0,Math.min(raw,tot-durMin))};
     }
   }
   return null;

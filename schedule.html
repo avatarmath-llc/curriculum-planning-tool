@@ -71,14 +71,19 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 .slot-line.hour{background:var(--primary-lt);opacity:.4;width:2px;}
 
 /* ── SESSION BLOCKS ── */
-.session-block{position:absolute;border-radius:5px;padding:4px 7px;color:white;font-size:10px;line-height:1.3;cursor:pointer;overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.22);transition:box-shadow .12s,transform .1s;z-index:2;}
+.session-block{position:absolute;border-radius:5px;padding:4px 7px;color:white;font-size:10px;line-height:1.3;cursor:grab;overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.22);transition:box-shadow .12s,transform .1s;z-index:2;}
 .session-block:hover{box-shadow:0 3px 12px rgba(0,0,0,.32);transform:translateY(-1px);}
+.session-block.dragging{opacity:0.25;pointer-events:none;}
 .sb-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sb-time{font-size:8.5px;opacity:.9;margin-top:1px;}
 .sb-teacher{font-size:8.5px;opacity:.75;}
 
-/* Drag preview */
+/* New-session drag preview */
 .drag-preview{position:absolute;top:4px;bottom:4px;background:rgba(46,104,161,.18);border:2px dashed var(--primary);border-radius:5px;pointer-events:none;z-index:1;}
+/* Move ghost */
+.ghost-block{position:fixed;pointer-events:none;z-index:600;border-radius:5px;padding:4px 7px;color:white;font-size:10px;line-height:1.3;box-shadow:0 6px 24px rgba(0,0,0,.4);opacity:.92;cursor:grabbing;transform:rotate(1.5deg) scale(1.04);}
+/* Drop indicator */
+.drop-target{position:absolute;top:4px;bottom:4px;background:rgba(46,104,161,.15);border:2px dashed var(--primary);border-radius:5px;pointer-events:none;z-index:1;}
 
 /* ── TOAST ── */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2c40;color:white;padding:8px 18px;border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;z-index:600;pointer-events:none;white-space:nowrap;}
@@ -341,7 +346,7 @@ function renderGrid(){
       const end=s.startMin+s.durationMin;
       html+=`<div class="session-block" data-id="${s.id}"
         style="left:${left}%;width:${width}%;top:${top}px;height:${h}px;background:${cls.color}"
-        onmousedown="e=>{e.stopPropagation();}" onclick="sessClick(event,${s.id})">
+        onmousedown="sessDown(event,${s.id})">
         <div class="sb-name">${esc(cls.name)}</div>
         <div class="sb-time">${fmt(s.startMin)}–${fmt(end)}</div>
         ${tch?`<div class="sb-teacher">${esc(tch.name)}</div>`:''}
@@ -470,10 +475,91 @@ function deleteSession(){
   closeSessModal();save();render();toast('Removed');
 }
 
-function sessClick(e,id){
+// ══════════════════════════════════════════
+// MOVE EXISTING SESSION (drag-to-move)
+// ══════════════════════════════════════════
+let mv=null;
+
+function sessDown(e,id){
   e.stopPropagation();
+  e.preventDefault();
   const s=sessions.find(x=>x.id===id);
-  if(s)openSessModal(s.id,s.day,s.startMin,s.durationMin);
+  if(!s)return;
+  const el=e.currentTarget||e.target.closest('.session-block');
+  const rect=el?el.getBoundingClientRect():{left:e.clientX,top:e.clientY};
+  mv={id,s,ox:e.clientX,oy:e.clientY,offX:e.clientX-rect.left,offY:e.clientY-rect.top,moved:false,ghost:null,targetDay:null,targetStart:null};
+  window.addEventListener('mousemove',mvMove);
+  window.addEventListener('mouseup',mvUp);
+}
+
+function mvMove(e){
+  if(!mv)return;
+  if(!mv.moved&&Math.abs(e.clientX-mv.ox)<5&&Math.abs(e.clientY-mv.oy)<5)return;
+  if(!mv.moved){
+    mv.moved=true;
+    const s=mv.s;
+    const cls=classes.find(c=>c.id===s.classId);
+    const tch=teachers.find(t=>t.id===s.teacherId);
+    const g=document.createElement('div');
+    g.className='ghost-block';
+    g.style.cssText=`background:${cls?.color||'#666'};width:130px`;
+    g.innerHTML=`<div class="sb-name">${esc(cls?.name||'')}</div><div class="sb-time">${fmt(s.startMin)}&#8211;${fmt(s.startMin+s.durationMin)}</div>${tch?`<div class="sb-teacher">${esc(tch.name)}</div>`:''}`;
+    document.body.appendChild(g);
+    mv.ghost=g;
+    document.querySelector(`.session-block[data-id="${s.id}"]`)?.classList.add('dragging');
+  }
+  mv.ghost.style.left=(e.clientX-mv.offX)+'px';
+  mv.ghost.style.top=(e.clientY-mv.offY)+'px';
+
+  const tgt=getDropTarget(e.clientX,e.clientY);
+  mv.targetDay=tgt?.day;mv.targetStart=tgt?.startMin;
+  document.querySelectorAll('.drop-target').forEach(el=>el.remove());
+  if(tgt){
+    const cv=document.getElementById('cv-'+tgt.day);
+    if(cv){
+      const{s:sm,tot}=slotInfo();
+      const ind=document.createElement('div');
+      ind.className='drop-target';
+      ind.style.left=((tgt.startMin-sm)/tot*100).toFixed(3)+'%';
+      ind.style.width=(mv.s.durationMin/tot*100).toFixed(3)+'%';
+      cv.appendChild(ind);
+    }
+  }
+}
+
+function mvUp(){
+  window.removeEventListener('mousemove',mvMove);
+  window.removeEventListener('mouseup',mvUp);
+  if(mv?.ghost)mv.ghost.remove();
+  document.querySelectorAll('.drop-target').forEach(el=>el.remove());
+  const m=mv;mv=null;
+  if(!m)return;
+  if(!m.moved){
+    openSessModal(m.id,m.s.day,m.s.startMin,m.s.durationMin);
+    return;
+  }
+  if(m.targetDay!=null&&m.targetStart!=null){
+    const s=sessions.find(x=>x.id===m.id);
+    if(s){s.day=m.targetDay;s.startMin=m.targetStart;}
+    save();toast('Moved');
+  }
+  render();
+}
+
+function getDropTarget(x,y){
+  const{s:startMin,tot}=slotInfo();
+  for(const day of DAYS){
+    const cv=document.getElementById('cv-'+day);
+    if(!cv)continue;
+    const r=cv.getBoundingClientRect();
+    if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){
+      const pct=(x-r.left)/r.width;
+      const raw=Math.round(pct*tot/15)*15;
+      const maxStart=tot-(mv?.s?.durationMin||60);
+      return{day,startMin:startMin+Math.max(0,Math.min(raw,maxStart))};
+    }
+  }
+  return null;
 }
 
 // ══════════════════════════════════════════

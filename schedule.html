@@ -230,7 +230,7 @@ let classes=[
   {id:1,name:'Math 1A',color:'#2E68A1'},
   {id:2,name:'Math 1B',color:'#3a8f2a'},
 ];
-let teachers=[{id:1,name:'Teacher 1'}];
+let teachers=[{id:1,name:'Teacher 1',color:PALETTE[0]}];
 let sessions=[];
 let nextCid=3,nextTid=2,nextSid=1;
 
@@ -306,7 +306,7 @@ function renderChips(){
       `<div class="class-chip" onmousedown="chipDown(event,${c.id})"><div class="chip-dot" style="background:${c.color}"></div>${esc(c.name)}</div>`
     ).join('');
   document.getElementById('teacher-chips').innerHTML=
-    teachers.map(t=>`<div class="class-chip" onmousedown="teacherDown(event,${t.id})">${esc(t.name)}</div>`).join('');
+    teachers.map(t=>`<div class="class-chip" onmousedown="teacherDown(event,${t.id})"><div class="chip-dot" style="background:${t.color||'#888'}"></div>${esc(t.name)}</div>`).join('');
 }
 
 function renderGrid(){
@@ -351,7 +351,7 @@ function renderGrid(){
       const h=LANE_H-LANE_PAD*2;
       const end=s.startMin+s.durationMin;
       html+=`<div class="session-block" data-id="${s.id}"
-        style="left:${left}%;width:${width}%;top:${top}px;height:${h}px;background:${cls.color}"
+        style="left:${left}%;width:${width}%;top:${top}px;height:${h}px;background:${tch?.color||cls?.color||'#888'}"
         onmousedown="sessDown(event,${s.id})">
         <div class="sb-name">${esc(cls.name)}</div>
         <div class="sb-time">${fmt(s.startMin)}–${fmt(end)}</div>
@@ -659,12 +659,14 @@ function openManageTeachers(){
 function renderTchList(){
   document.getElementById('tch-list').innerHTML=tmpTch.map((t,i)=>`
     <div class="manage-item">
+      <input type="color" value="${t.color||'#2E68A1'}" style="width:28px;height:28px;border:none;cursor:pointer;border-radius:50%;padding:0;background:none;flex-shrink:0"
+        oninput="tmpTch[${i}].color=this.value">
       <input type="text" value="${esc(t.name)}" oninput="tmpTch[${i}].name=this.value" placeholder="Teacher name">
       <button class="del-btn" onclick="tmpTch.splice(${i},1);renderTchList()">&#10005;</button>
     </div>`).join('');
 }
 function addTeacherRow(){
-  tmpTch.push({id:nextTid++,name:'New Teacher'});
+  tmpTch.push({id:nextTid++,name:'New Teacher',color:PALETTE[tmpTch.length%PALETTE.length]});
   renderTchList();
 }
 function saveTeachers(){
@@ -693,7 +695,7 @@ function teacherDown(e,teacherId){
   if(!tch)return;
   const g=document.createElement('div');
   g.className='teacher-ghost';
-  g.style.cssText=`left:${e.clientX-10}px;top:${e.clientY-16}px`;
+  g.style.cssText=`left:${e.clientX-10}px;top:${e.clientY-16}px;background:${tch.color||'var(--primary)'}`;
   g.textContent=tch.name;
   document.body.appendChild(g);
   tdrag={teacherId,tch,ghost:g,targetId:null};

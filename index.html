@@ -573,7 +573,7 @@ function setView(v){
 }
 
 function clearAllFilters(){
-  selGrades.clear();selDomains.clear();
+  selGrades.clear();selDomains.clear();rebuildDomainChips();
   viewMode='all';
   document.getElementById('search-input').value='';
   document.getElementById('nbr-chk').checked=false;

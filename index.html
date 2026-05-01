@@ -175,7 +175,7 @@ td.drop-cell:hover{background:var(--cell-hover);}
 .cell-dot[data-type="M"]{background:var(--M);}
 .cell-dot[data-type="R"]{background:var(--R);color:var(--R-text);}
 
-td.drop-cell:not(:has(.cell-dot)):hover::after{content:'+';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--border2);font-size:14px;pointer-events:none;}
+td.drop-cell:not(:has(.cell-dot)):not(.col-dimmed):hover::after{content:'+';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--border2);font-size:14px;pointer-events:none;}
 
 /* ══ GRADE INDICATOR ══ */
 function toggleGradeIndicator(){
@@ -693,8 +693,8 @@ function applyFilters(){
     const isSelected=selGrades.has(gi);
     const isNeighbor=effGrades.has(gi)&&!isSelected;
     th.classList.toggle('col-active',inRange&&selGrades.size>0);
-    th.classList.toggle('col-dimmed',false);
-    th.classList.toggle('col-hidden',!inRange&&selGrades.size>0);
+    th.classList.toggle('col-dimmed',!inRange&&selGrades.size>0);
+    if(selGrades.size===0)th.classList.remove('col-hidden');
   });
 
   // Per-row filtering
@@ -756,8 +756,8 @@ function applyFilters(){
     const gi=parseInt(td.dataset.gi);
     const inRange=selGrades.size===0||effGrades.has(gi);
     td.classList.toggle('col-active',inRange&&selGrades.size>0);
-    td.classList.toggle('col-dimmed',false);
-    td.classList.toggle('col-hidden',!inRange&&selGrades.size>0);
+    td.classList.toggle('col-dimmed',!inRange&&selGrades.size>0);
+    if(selGrades.size===0)td.classList.remove('col-hidden');
   });
 
   // Count
@@ -1042,8 +1042,13 @@ function toggleGradeIndicator(){
     document.querySelectorAll('.col-hidden').forEach(el=>el.classList.remove('col-hidden'));
     document.getElementById('sel-grades-indicator').classList.remove('active');
   }else{
-    // Hide non-selected columns
-    applyFilters();
+    const effG=new Set(selGrades);
+    if(document.getElementById('nbr-chk').checked){
+      selGrades.forEach(gi=>{if(gi>0)effG.add(gi-1);if(gi<12)effG.add(gi+1);});
+    }
+    document.querySelectorAll('thead th[data-gi],td.drop-cell').forEach(el=>{
+      el.classList.toggle('col-hidden',!effG.has(parseInt(el.dataset.gi)));
+    });
     document.getElementById('sel-grades-indicator').classList.add('active');
   }
 }

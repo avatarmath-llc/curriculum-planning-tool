@@ -698,21 +698,13 @@ function applyFilters(){
       const show=domainMatch&&nameMatch&&(selGrades.size===0||hasInRange);
       const tr=document.querySelector(`tr.topic-row[data-di="${di}"][data-ti="${ti}"]`);
       if(!tr)return;
-      // Search always hides; grade/domain use view mode
       const searchFail = q!=='' && !nameMatch;
-      const gradeDomainFail = !show && !searchFail;
-      if(searchFail){
-        tr.classList.add('row-hidden');
-        tr.classList.remove('row-dimmed');
-      }else if(viewMode==='only'){
-        tr.classList.toggle('row-hidden', gradeDomainFail);
-        tr.classList.remove('row-dimmed');
-      }else if(viewMode==='dim'){
-        tr.classList.remove('row-hidden');
-        tr.classList.toggle('row-dimmed', gradeDomainFail);
-      }else{
-        tr.classList.remove('row-hidden','row-dimmed');
-      }
+      const domainFail = selDomains.size>0 && !domainMatch;
+      const gradeFail = selGrades.size>0 && !hasInRange;
+      const hideRow = searchFail || domainFail || (viewMode==='only' && gradeFail);
+      const dimRow = !hideRow && viewMode==='dim' && gradeFail;
+      tr.classList.toggle('row-hidden', hideRow);
+      tr.classList.toggle('row-dimmed', dimRow);
       // Highlight search term
       const nameEl=tr.querySelector('.t-name-text');
       if(nameEl){
@@ -722,20 +714,16 @@ function applyFilters(){
           nameEl.textContent=topic.name;
         }
       }
-      if(show){visibleTopics++;anyVisible=true;}
+      if(!hideRow){visibleTopics++;anyVisible=true;}
     });
-    // Hide domain row if all topics hidden
+    // Hide domain header when all its topics are hidden
     const drow=document.querySelector(`tr.domain-row[data-di="${di}"]`);
     if(drow){
       const allHidden = domain.topics.every((_,ti2)=>{
         const tr2=document.querySelector(`tr.topic-row[data-di="${di}"][data-ti="${ti2}"]`);
         return tr2 && tr2.classList.contains('row-hidden');
       });
-      if(viewMode==='only'||q!==''){
-        drow.classList.toggle('domain-hidden', allHidden || (!domainMatch && q===''));
-      }else{
-        drow.classList.remove('domain-hidden');
-      }
+      drow.classList.toggle('domain-hidden', allHidden && (selDomains.size>0||selGrades.size>0||q!==''));
     }
   });
 

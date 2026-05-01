@@ -140,6 +140,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 table{border-collapse:collapse;min-width:980px;width:100%;}
 thead th{position:sticky;top:0;background:var(--thead-bg);padding:7px 3px 5px;text-align:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;z-index:10;transition:background .25s,opacity .2s;}
 thead th:first-child{text-align:left;padding-left:6px;width:420px;min-width:380px;}
+.th-sub{display:block;font-size:8px;letter-spacing:.02em;text-transform:none;font-style:italic;color:var(--primary-lt);margin-top:1px;font-weight:400;}
 th.band,td.band{border-left:1px dashed var(--border);}
 
 /* Grade column states */
@@ -346,8 +347,8 @@ footer a{color:var(--primary-lt);text-decoration:none;}
       <th>Topic / Subtopic</th>
       <th class="band" data-gi="0">K</th><th data-gi="1">1</th><th data-gi="2">2</th>
       <th class="band" data-gi="3">3</th><th data-gi="4">4</th><th data-gi="5">5</th>
-      <th class="band" data-gi="6">6</th><th data-gi="7">7</th><th data-gi="8">8</th>
-      <th class="band" data-gi="9">9</th><th data-gi="10">10</th><th data-gi="11">11</th><th data-gi="12">12</th>
+      <th class="band" data-gi="6">6</th><th data-gi="7">7</th><th data-gi="8">8<span class="th-sub">Alg 1</span></th>
+      <th class="band" data-gi="9">9<span class="th-sub">Geo</span></th><th data-gi="10">10<span class="th-sub">Alg 2</span></th><th data-gi="11">11<span class="th-sub">Pre-C</span></th><th data-gi="12">12<span class="th-sub">Calc</span></th>
     </tr></thead>
     <tbody id="tbody"></tbody>
   </table>

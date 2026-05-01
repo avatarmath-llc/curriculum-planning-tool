@@ -850,7 +850,7 @@ function renderCell(td,val){
   const dot=document.createElement('div');
   dot.className='cell-dot';dot.dataset.type=val;
   dot.title=LABEL[val]+' \u2014 click to remove';
-  dot.textContent=val==='C'?'\u25CF':val==='R'?'r':val;
+  dot.textContent=val==='C'?'\u25CF':val;
   td.appendChild(dot);
 }
 

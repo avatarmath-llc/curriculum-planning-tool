@@ -132,13 +132,15 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .legend-bar{display:flex;gap:14px;padding:5px 16px;border-bottom:1px solid var(--border);background:var(--leg-bg);flex-wrap:wrap;align-items:center;transition:background .25s;}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;}
 .leg-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:white;font-weight:600;}
+#sel-grades-indicator:hover{background:var(--surface2);border-color:var(--border2)!important;color:var(--ink);}
+#sel-grades-indicator.active{background:var(--primary);border-color:var(--primary)!important;color:white;}
 .hint-bar{background:var(--hint-bg);border-bottom:1px solid var(--border);padding:5px 16px;font-size:10px;color:var(--hint-color);min-height:26px;transition:background .25s;}
 
 /* ══ TABLE ══ */
 .table-wrap{overflow-x:auto;padding:12px 16px 80px;}
 table{border-collapse:collapse;min-width:980px;width:100%;}
-thead th{position:sticky;top:0;background:var(--thead-bg);padding:7px 3px 5px;text-align:center;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;z-index:10;transition:background .25s,opacity .2s;}
-thead th:first-child{text-align:left;padding-left:6px;width:230px;min-width:200px;}
+thead th{position:sticky;top:0;background:var(--thead-bg);padding:7px 3px 5px;text-align:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;z-index:10;transition:background .25s,opacity .2s;}
+thead th:first-child{text-align:left;padding-left:6px;width:300px;min-width:280px;}
 th.band,td.band{border-left:1px dashed var(--border);}
 
 /* Grade column states */
@@ -146,8 +148,9 @@ th.col-active,td.col-active{background:var(--col-focus-bg);}
 th.col-dimmed{opacity:var(--col-dimmed);}
 td.col-dimmed .cell-dot{opacity:var(--col-dimmed);}
 td.col-dimmed{cursor:default!important;}
+th.col-hidden,td.col-hidden{display:none!important;}
 
-tr.domain-row td{padding:12px 8px 4px;font-family:'Playfair Display',serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:white;border-bottom:1px solid;}
+tr.domain-row td{padding:12px 8px 4px;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:white;border-bottom:1px solid;}
 .domain-acts{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
 .icon-btn{width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,.15);border:none;color:white;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:background .12s;}
 .icon-btn:hover{background:rgba(255,255,255,.3);}
@@ -158,15 +161,15 @@ tr.topic-row.row-hidden{display:none;}
 tr.topic-row.row-dimmed{opacity:.25;}
 tr.domain-row.domain-hidden{display:none;}
 td:first-child{padding:4px 6px;line-height:1.35;}
-.t-name{display:inline;font-size:11px;color:var(--ink);}
-.t-sub{display:block;font-size:10px;color:var(--muted);font-style:italic;margin-top:1px;}
+.t-name{display:inline;font-size:13px;color:var(--ink);}
+.t-sub{display:block;font-size:12px;color:var(--muted);font-style:italic;margin-top:1px;}
 .topic-acts{display:none;gap:3px;vertical-align:middle;margin-left:5px;}
 tr.topic-row:hover .topic-acts{display:inline-flex;}
 .search-hl{background:rgba(253,221,84,.35);border-radius:2px;padding:0 1px;}
 
 td.drop-cell{text-align:center;vertical-align:middle;padding:2px 1px;min-width:32px;height:34px;cursor:pointer;position:relative;transition:background .1s;}
 td.drop-cell:hover{background:var(--cell-hover);}
-.cell-dot{width:22px;height:22px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:white;transition:transform .1s,box-shadow .1s;user-select:none;}
+.cell-dot{width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;transition:transform .1s,box-shadow .1s;user-select:none;}
 .cell-dot:hover{transform:scale(1.2);box-shadow:0 2px 8px rgba(0,0,0,.35);}
 .cell-dot[data-type="I"]{background:var(--I);}
 .cell-dot[data-type="C"]{background:var(--C);}
@@ -175,6 +178,39 @@ td.drop-cell:hover{background:var(--cell-hover);}
 body.paint-mode .drop-cell{cursor:crosshair;}
 body.paint-mode .drop-cell:hover{background:var(--paint-hover);}
 td.drop-cell:not(:has(.cell-dot)):hover::after{content:'+';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--border2);font-size:14px;pointer-events:none;}
+
+/* ══ GRADE INDICATOR ══ */
+function toggleGradeIndicator(){
+  if(selGrades.size===0)return;
+  // Toggle: if currently in col-hidden mode, go back to showing all; if showing all, hide non-selected
+  const anyHidden=document.querySelector('th.col-hidden');
+  if(anyHidden){
+    // Un-hide — clear col-hidden (but keep selection)
+    document.querySelectorAll('.col-hidden').forEach(el=>el.classList.remove('col-hidden'));
+    document.getElementById('sel-grades-indicator').classList.remove('active');
+  }else{
+    // Hide non-selected columns
+    applyFilters();
+    document.getElementById('sel-grades-indicator').classList.add('active');
+  }
+}
+
+function updateGradeIndicator(){
+  const el=document.getElementById('sel-grades-label');
+  const ind=document.getElementById('sel-grades-indicator');
+  if(!el||!ind)return;
+  if(selGrades.size===0){
+    el.textContent='No grades selected';
+    ind.style.cursor='default';
+    ind.title='Select grade pills above to filter columns';
+    ind.classList.remove('active');
+  }else{
+    const labels=[...selGrades].sort((a,b)=>a-b).map(i=>GRADE_LABELS[i]);
+    el.textContent='Gr '+labels.join(', ')+' — click to toggle columns';
+    ind.style.cursor='pointer';
+    ind.title='Click to show/hide only selected grade columns';
+  }
+}
 
 /* ══ TOAST ══ */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--toast-bg);border:1px solid var(--border2);color:var(--toast-color);padding:7px 18px;border-radius:20px;font-size:11px;transition:transform .25s,opacity .25s;opacity:0;pointer-events:none;z-index:500;}
@@ -208,7 +244,7 @@ td.drop-cell:not(:has(.cell-dot)):hover::after{content:'+';position:absolute;ins
   tr.domain-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .cell-dot{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   tr.row-hidden,tr.domain-hidden{display:none!important;}
-  th.col-dimmed,td.col-dimmed{display:none!important;}
+  th.col-dimmed,td.col-dimmed,th.col-hidden,td.col-hidden{display:none!important;}
   th.col-active,td.col-active{background:none!important;}
 }
 .print-header{display:none;padding:8px 0 12px;border-bottom:2px solid #2E68A1;margin-bottom:10px;}
@@ -299,8 +335,9 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="leg-item"><div class="leg-dot" style="background:var(--C)">&#9679;</div>Core focus</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--M)">M</div>Mastery</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--R);color:var(--R-text)">r</div>Review</div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);">
-    <span style="width:14px;height:14px;border-radius:2px;background:var(--col-focus-bg);border:1px solid var(--border2);display:inline-block;"></span> Selected grades
+  <div id="sel-grades-indicator" onclick="toggleGradeIndicator()" style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);cursor:pointer;padding:3px 8px;border-radius:10px;border:1px solid transparent;transition:background .15s,border-color .15s;" title="Click to show/hide only selected grades">
+    <span style="width:14px;height:14px;border-radius:2px;background:var(--col-focus-bg);border:1px solid var(--border2);display:inline-block;flex-shrink:0;"></span>
+    <span id="sel-grades-label">No grades selected</span>
   </div>
 </div>
 <div class="hint-bar" id="hint-bar">Select a dot from the palette to place it &nbsp;&middot;&nbsp; Click an existing dot (no tool) to remove &nbsp;&middot;&nbsp; Use filters above to focus by grade, domain, or keyword</div>
@@ -573,7 +610,8 @@ function applyFilters(){
     const isSelected=selGrades.has(gi);
     const isNeighbor=effGrades.has(gi)&&!isSelected;
     th.classList.toggle('col-active',inRange&&selGrades.size>0);
-    th.classList.toggle('col-dimmed',!inRange&&selGrades.size>0&&viewMode!=='all');
+    th.classList.toggle('col-dimmed',false);
+    th.classList.toggle('col-hidden',!inRange&&selGrades.size>0);
   });
 
   // Per-row filtering
@@ -589,12 +627,18 @@ function applyFilters(){
       const show=domainMatch&&nameMatch&&(selGrades.size===0||hasInRange);
       const tr=document.querySelector(`tr.topic-row[data-di="${di}"][data-ti="${ti}"]`);
       if(!tr)return;
-      if(viewMode==='only'){
-        tr.classList.toggle('row-hidden',!show);
+      // Search always hides; grade/domain use view mode
+      const searchFail = q!=='' && !nameMatch;
+      const gradeDomainFail = !show && !searchFail;
+      if(searchFail){
+        tr.classList.add('row-hidden');
+        tr.classList.remove('row-dimmed');
+      }else if(viewMode==='only'){
+        tr.classList.toggle('row-hidden', gradeDomainFail);
         tr.classList.remove('row-dimmed');
       }else if(viewMode==='dim'){
         tr.classList.remove('row-hidden');
-        tr.classList.toggle('row-dimmed',!show);
+        tr.classList.toggle('row-dimmed', gradeDomainFail);
       }else{
         tr.classList.remove('row-hidden','row-dimmed');
       }
@@ -612,8 +656,12 @@ function applyFilters(){
     // Hide domain row if all topics hidden
     const drow=document.querySelector(`tr.domain-row[data-di="${di}"]`);
     if(drow){
-      if(viewMode==='only'){
-        drow.classList.toggle('domain-hidden',!anyVisible||!domainMatch);
+      const allHidden = domain.topics.every((_,ti2)=>{
+        const tr2=document.querySelector(`tr.topic-row[data-di="${di}"][data-ti="${ti2}"]`);
+        return tr2 && tr2.classList.contains('row-hidden');
+      });
+      if(viewMode==='only'||q!==''){
+        drow.classList.toggle('domain-hidden', allHidden || (!domainMatch && q===''));
       }else{
         drow.classList.remove('domain-hidden');
       }
@@ -625,13 +673,15 @@ function applyFilters(){
     const gi=parseInt(td.dataset.gi);
     const inRange=selGrades.size===0||effGrades.has(gi);
     td.classList.toggle('col-active',inRange&&selGrades.size>0);
-    td.classList.toggle('col-dimmed',!inRange&&selGrades.size>0);
+    td.classList.toggle('col-dimmed',false);
+    td.classList.toggle('col-hidden',!inRange&&selGrades.size>0);
   });
 
   // Count
   const cEl=document.getElementById('filter-count');
   const hasFilter=selGrades.size>0||selDomains.size>0||q;
   cEl.textContent=hasFilter?`${visibleTopics} / ${totalTopics} topics`:'';
+  updateGradeIndicator();
 
   // Update print subtitle
   updatePrintSubtitle(effGrades,q);
@@ -886,6 +936,39 @@ function openExport(){
 }
 function copyExport(){
   const ta=document.getElementById('export-text');ta.select();document.execCommand('copy');toast('Copied!');
+}
+
+/* ══ GRADE INDICATOR ══ */
+function toggleGradeIndicator(){
+  if(selGrades.size===0)return;
+  // Toggle: if currently in col-hidden mode, go back to showing all; if showing all, hide non-selected
+  const anyHidden=document.querySelector('th.col-hidden');
+  if(anyHidden){
+    // Un-hide — clear col-hidden (but keep selection)
+    document.querySelectorAll('.col-hidden').forEach(el=>el.classList.remove('col-hidden'));
+    document.getElementById('sel-grades-indicator').classList.remove('active');
+  }else{
+    // Hide non-selected columns
+    applyFilters();
+    document.getElementById('sel-grades-indicator').classList.add('active');
+  }
+}
+
+function updateGradeIndicator(){
+  const el=document.getElementById('sel-grades-label');
+  const ind=document.getElementById('sel-grades-indicator');
+  if(!el||!ind)return;
+  if(selGrades.size===0){
+    el.textContent='No grades selected';
+    ind.style.cursor='default';
+    ind.title='Select grade pills above to filter columns';
+    ind.classList.remove('active');
+  }else{
+    const labels=[...selGrades].sort((a,b)=>a-b).map(i=>GRADE_LABELS[i]);
+    el.textContent='Gr '+labels.join(', ')+' — click to toggle columns';
+    ind.style.cursor='pointer';
+    ind.title='Click to show/hide only selected grade columns';
+  }
 }
 
 /* ══ TOAST ══ */

@@ -65,7 +65,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .brand-name span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-top:1px;}
 .brand-url{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.05em;}
 .brand-spacer{flex:1;}
-.brand-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);}
+.brand-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);white-space:nowrap;}
 .brand-title span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;}
 .brand-sep{font-size:.85rem;color:#c9a83c;vertical-align:middle;}
 .theme-toggle{display:flex;align-items:center;background:rgba(0,0,0,.25);border-radius:20px;padding:3px;border:1px solid rgba(255,255,255,.2);flex-shrink:0;}
@@ -103,9 +103,6 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .grade-pill.selected{background:var(--grade-sel-bg);color:var(--grade-sel-c);border-color:var(--grade-sel-bg);}
 .grade-pill.neighbor{background:var(--grade-nbr-bg);color:var(--grade-nbr-c);border-color:var(--border2);}
 
-/* Neighbor toggle */
-.nbr-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px;color:var(--muted);user-select:none;}
-.nbr-toggle input{accent-color:var(--primary-lt);}
 
 /* Domain chips */
 .domain-chips{display:flex;gap:5px;flex-wrap:wrap;}
@@ -300,9 +297,6 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="filter-row">
     <span class="filter-label">Grades</span>
     <div class="grade-pills" id="grade-pills"></div>
-    <label class="nbr-toggle" title="Also highlight ±1 neighboring grades">
-      <input type="checkbox" id="nbr-chk" onchange="applyFilters()"> +1 neighbor
-    </label>
     <div class="t-sep" style="margin:0 4px;"></div>
     <span class="filter-label" style="min-width:36px">View</span>
     <div class="view-btns">
@@ -332,7 +326,7 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="leg-item"><div class="leg-dot" style="background:var(--I)">I</div>Introduced</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--C)">&#9679;</div>Core focus</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--M)">M</div>Mastery</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--R);color:var(--R-text)">r</div>Review</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--R);color:var(--R-text)">R</div>Review</div>
   <div id="sel-grades-indicator" onclick="toggleGradeIndicator()" style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);cursor:pointer;padding:3px 8px;border-radius:10px;border:1px solid transparent;transition:background .15s,border-color .15s;" title="Click to show/hide only selected grades">
     <span style="width:14px;height:14px;border-radius:2px;background:var(--col-focus-bg);border:1px solid var(--border2);display:inline-block;flex-shrink:0;"></span>
     <span id="sel-grades-label">No grades selected</span>
@@ -359,7 +353,7 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="pal-dot" data-type="I" title="Introduced" onclick="pickCellType('I')">I</div>
   <div class="pal-dot" data-type="C" title="Core focus" onclick="pickCellType('C')">&#9679;</div>
   <div class="pal-dot" data-type="M" title="Mastery" onclick="pickCellType('M')">M</div>
-  <div class="pal-dot" data-type="R" title="Review" onclick="pickCellType('R')">r</div>
+  <div class="pal-dot" data-type="R" title="Review" onclick="pickCellType('R')">R</div>
   <div class="pal-dot" data-type="X" title="Remove" onclick="pickCellType('X')">&#10005;</div>
 </div>
 
@@ -659,7 +653,6 @@ function clearAllFilters(){
   selGrades.clear();selDomains.clear();rebuildDomainChips();
   viewMode='all';
   document.getElementById('search-input').value='';
-  document.getElementById('nbr-chk').checked=false;
   neighborMode=false;
   ['all','only','dim'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x==='all'));
   applyFilters();
@@ -667,7 +660,6 @@ function clearAllFilters(){
 
 /* ══ APPLY FILTERS ══ */
 function applyFilters(){
-  neighborMode=document.getElementById('nbr-chk').checked;
   const q=document.getElementById('search-input').value.trim().toLowerCase();
 
   // Build effective grade set (with neighbors)

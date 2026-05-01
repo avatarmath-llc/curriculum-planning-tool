@@ -65,7 +65,8 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .brand-name span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-top:1px;}
 .brand-url{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.05em;}
 .brand-spacer{flex:1;}
-.brand-tag{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.08em;text-transform:uppercase;text-align:right;line-height:1.6;}
+.brand-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);}
+.brand-title span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;}
 .theme-toggle{display:flex;align-items:center;background:rgba(0,0,0,.25);border-radius:20px;padding:3px;border:1px solid rgba(255,255,255,.2);flex-shrink:0;}
 .theme-btn{padding:4px 12px;border-radius:16px;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:background .2s,color .2s;display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.6);background:transparent;}
 .theme-btn.active{background:white;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,.3);}
@@ -274,11 +275,12 @@ footer a{color:var(--primary-lt);text-decoration:none;}
     <div class="brand-url">avatarlc.com</div>
   </div>
   <div class="brand-spacer"></div>
+  <div class="brand-title">Curriculum Planning Tool<span>K–12 Math · Avatar Learning Center</span></div>
+  <div class="brand-spacer"></div>
   <div class="theme-toggle" role="group" aria-label="Theme">
     <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">&#9790; Dark</button>
     <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">&#9788; Light</button>
   </div>
-  <div class="brand-tag">Curriculum<br>Planning Tool</div>
 </div>
 
 <!-- TOOLBAR -->

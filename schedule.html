@@ -51,7 +51,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 
 /* ── SCHEDULE GRID ── */
 .schedule-wrap{padding:12px 16px;overflow-x:auto;}
-.schedule-grid{min-width:680px;}
+.schedule-grid{min-width:400px;}
 
 /* Ruler */
 .ruler-row{display:grid;grid-template-columns:var(--label-w) 1fr;margin-bottom:3px;}
@@ -308,7 +308,7 @@ function renderGrid(){
   for(let i=0;i<=numSlots;i++){
     const m=startMin+i*15,isHour=m%60===0,pct=(i/numSlots*100).toFixed(3);
     if(i<numSlots)html+=`<div class="ruler-slot${isHour?' hour':''}" style="left:${pct}%;width:${(100/numSlots).toFixed(3)}%"></div>`;
-    if(isHour||m%30===0)html+=`<span class="ruler-label" style="left:${pct}%">${fmt(m)}</span>`;
+    if(isHour)html+=`<span class="ruler-label" style="left:${pct}%">${fmt(m)}</span>`;
   }
   html+=`</div></div>`;
 
@@ -355,14 +355,7 @@ function renderGrid(){
 }
 
 function assignLanes(sess){
-  const sorted=[...sess].sort((a,b)=>a.startMin-b.startMin);
-  const ends=[];
-  sorted.forEach(s=>{
-    let lane=ends.findIndex(e=>e<=s.startMin);
-    if(lane===-1)lane=ends.length;
-    s.lane=lane;
-    ends[lane]=s.startMin+s.durationMin;
-  });
+  sess.forEach((s,i)=>{ s.lane=i; });
 }
 
 // ══════════════════════════════════════════

@@ -253,6 +253,10 @@ function updateGradeIndicator(){
 
 footer{text-align:center;padding:14px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);letter-spacing:.04em;background:var(--footer-bg);transition:background .25s;}
 footer a{color:var(--primary-lt);text-decoration:none;}
+
+/* ══ CELL PICKER ══ */
+#cell-picker{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:6px 8px;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.28);transition:background .25s;}
+#cell-picker.open{display:flex;}
 </style>
 </head>
 <body>
@@ -361,6 +365,12 @@ footer a{color:var(--primary-lt);text-decoration:none;}
 
 <footer>&copy; <span id="yr"></span> <a href="https://avatarlc.com" target="_blank">Avatar Learning Center</a> &nbsp;&middot;&nbsp; Based on Common Core State Standards &nbsp;&middot;&nbsp; <a href="https://corestandards.org" target="_blank">corestandards.org</a></footer>
 <div id="toast"></div>
+<div id="cell-picker">
+  <div class="pal-dot" data-type="I" title="Introduced" onclick="pickCellType('I')">I</div>
+  <div class="pal-dot" data-type="C" title="Core focus" onclick="pickCellType('C')">&#9679;</div>
+  <div class="pal-dot" data-type="M" title="Mastery" onclick="pickCellType('M')">M</div>
+  <div class="pal-dot" data-type="R" title="Review" onclick="pickCellType('R')">r</div>
+</div>
 
 <!-- MODAL: Topic -->
 <div class="modal-overlay" id="topic-modal">
@@ -800,7 +810,35 @@ function selectTool(type){
   }
 }
 document.querySelectorAll('.pal-dot').forEach(d=>d.addEventListener('click',()=>selectTool(d.dataset.type)));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')selectTool(null);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){selectTool(null);hideCellPicker();}});
+
+/* ══ CELL PICKER ══ */
+let pickerKey=null,pickerTd=null;
+function showCellPicker(td,key,e){
+  pickerKey=key;pickerTd=td;
+  const pk=document.getElementById('cell-picker');
+  pk.classList.add('open');
+  const rect=td.getBoundingClientRect();
+  const pw=136,ph=40;
+  let left=rect.left+rect.width/2-pw/2;
+  let top=rect.bottom+6;
+  if(left<4)left=4;
+  if(left+pw>window.innerWidth-4)left=window.innerWidth-4-pw;
+  if(top+ph>window.innerHeight-4)top=rect.top-ph-6;
+  pk.style.left=left+'px';pk.style.top=top+'px';
+  e.stopPropagation();
+}
+function pickCellType(type){
+  if(!pickerKey)return;
+  cells[pickerKey]=type;save();renderCell(pickerTd,type);toast(LABEL[type]);
+  hideCellPicker();
+}
+function hideCellPicker(){
+  document.getElementById('cell-picker').classList.remove('open');
+  pickerKey=null;pickerTd=null;
+}
+document.addEventListener('click',hideCellPicker);
+document.getElementById('cell-picker').addEventListener('click',e=>e.stopPropagation());
 
 /* ══ TABLE ══ */
 const LABEL={I:'Introduced',C:'Core focus',M:'Mastery',R:'Review / extend'};
@@ -840,13 +878,16 @@ function buildTable(){
         td.className='drop-cell'+([0,3,6,9].includes(gi)?' band':'');
         td.dataset.key=key; td.dataset.gi=gi;
         renderCell(td,cells[key]);
-        td.addEventListener('click',()=>{
+        td.addEventListener('click',e=>{
           if(td.classList.contains('col-dimmed'))return;
           if(selectedTool){
             const v=selectedTool==='X'?null:selectedTool;
             cells[key]=v;save();renderCell(td,v);toast(v?LABEL[v]:'Cleared');
+            hideCellPicker();
           }else if(cells[key]){
             cells[key]=null;save();renderCell(td,null);toast('Removed');
+          }else{
+            showCellPicker(td,key,e);
           }
         });
         tr.appendChild(td);

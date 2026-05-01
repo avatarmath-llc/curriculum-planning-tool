@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Class Scheduler — Avatar Learning Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --primary:#2E68A1; --primary-lt:#5AACCF;
+  --bg:#f4f7fb; --surface:#fff; --surface2:#e8f0f8;
+  --border:#c2d8ee; --border2:#5AACCF;
+  --ink:#1a2c40; --muted:#6a8aab;
+  --label-w:80px;
+  --ruler-h:34px;
+  --lane-h:58px;
+}
+
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+/* ── BRAND BAR ── */
+.brand-bar{background:linear-gradient(120deg,#19416f 0%,#2d67a0 55%,#3a7ab8 100%);padding:8px 20px;display:flex;align-items:center;gap:14px;border-bottom:4px solid #c9a83c;box-shadow:0 3px 12px rgba(0,0,0,.35);}
+.brand-icon-wrap{width:50px;height:50px;overflow:hidden;border-radius:7px;box-shadow:0 2px 10px rgba(0,0,0,.35);flex-shrink:0;}
+.brand-icon-wrap img{height:91px;width:auto;display:block;margin-top:-9px;margin-left:-16px;}
+.brand-spacer{flex:1;}
+.brand-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);white-space:nowrap;}
+.brand-sub{display:block;font-size:.6rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;}
+.brand-sep{font-size:.85rem;color:#c9a83c;vertical-align:middle;}
+
+/* ── CONFIG BAR ── */
+.config-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 16px;display:flex;align-items:center;gap:16px;font-size:11px;color:var(--muted);flex-wrap:wrap;}
+.config-bar label{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.config-bar input[type=time]{font-family:'DM Mono',monospace;font-size:11px;border:1px solid var(--border);border-radius:4px;padding:2px 6px;background:var(--surface);color:var(--ink);}
+.vdiv{width:1px;height:22px;background:var(--border);flex-shrink:0;}
+
+/* ── TOOLBAR ── */
+.toolbar{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tool-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.chips-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.class-chip{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:10px;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.chip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.btn{padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:var(--primary);color:white;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:background .15s;white-space:nowrap;}
+.btn:hover{background:#1a4a7a;}
+.btn.sec{background:var(--surface);color:var(--ink);border-color:var(--border);}
+.btn.sec:hover{background:var(--surface2);}
+.btn.danger{background:#d42b20;border-color:#d42b20;}
+.btn.danger:hover{background:#a81e16;}
+
+/* ── SCHEDULE GRID ── */
+.schedule-wrap{padding:12px 16px;overflow-x:auto;}
+.schedule-grid{min-width:680px;}
+
+/* Ruler */
+.ruler-row{display:grid;grid-template-columns:var(--label-w) 1fr;margin-bottom:3px;}
+.ruler-inner{position:relative;height:var(--ruler-h);border-left:2px solid var(--primary-lt);overflow:hidden;}
+.ruler-slot{position:absolute;top:0;bottom:0;border-right:1px solid var(--border);}
+.ruler-slot.hour{border-right:2px solid var(--primary-lt);}
+.ruler-label{position:absolute;bottom:4px;font-size:9px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;}
+
+/* Day row */
+.day-row{display:grid;grid-template-columns:var(--label-w) 1fr;margin-bottom:3px;}
+.day-label-cell{display:flex;align-items:flex-start;justify-content:flex-end;padding:8px 8px 0 0;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--primary);}
+.day-canvas{position:relative;border:1px solid var(--border);border-left:2px solid var(--primary-lt);border-radius:0 5px 5px 0;background:var(--surface);cursor:crosshair;user-select:none;overflow:hidden;}
+.day-canvas:hover{background:#fafcff;}
+
+/* Grid lines via JS-rendered divs */
+.slot-line{position:absolute;top:0;bottom:0;width:1px;background:var(--border);pointer-events:none;}
+.slot-line.hour{background:var(--primary-lt);opacity:.4;width:2px;}
+
+/* ── SESSION BLOCKS ── */
+.session-block{position:absolute;border-radius:5px;padding:4px 7px;color:white;font-size:10px;line-height:1.3;cursor:pointer;overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,.22);transition:box-shadow .12s,transform .1s;z-index:2;}
+.session-block:hover{box-shadow:0 3px 12px rgba(0,0,0,.32);transform:translateY(-1px);}
+.sb-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-time{font-size:8.5px;opacity:.9;margin-top:1px;}
+.sb-teacher{font-size:8.5px;opacity:.75;}
+
+/* Drag preview */
+.drag-preview{position:absolute;top:4px;bottom:4px;background:rgba(46,104,161,.18);border:2px dashed var(--primary);border-radius:5px;pointer-events:none;z-index:1;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2c40;color:white;padding:8px 18px;border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;z-index:600;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:10px;padding:20px 24px;min-width:300px;max-width:440px;width:92%;box-shadow:0 8px 40px rgba(0,0,0,.3);}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);margin-bottom:14px;}
+.field{margin-bottom:11px;}
+.field label{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.field input,.field select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-family:'DM Mono',monospace;font-size:12px;background:var(--surface);color:var(--ink);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--border2);}
+.modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+/* Duration selector */
+.dur-row{display:flex;gap:6px;}
+.dur-btn{flex:1;padding:8px 4px;border-radius:6px;border:2px solid var(--border);background:var(--surface2);color:var(--ink);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;text-align:center;transition:all .15s;}
+.dur-btn.active{border-color:var(--primary);background:var(--primary);color:white;}
+
+/* Manage list */
+.manage-list{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.manage-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);}
+.manage-item input[type=text]{flex:1;border:none;background:transparent;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);outline:none;}
+.manage-item input[type=text]:focus{background:white;border-radius:3px;padding:1px 4px;}
+.del-btn{background:none;border:none;color:#d42b20;cursor:pointer;font-size:14px;flex-shrink:0;line-height:1;}
+.del-btn:hover{color:#a81e16;}
+.time-info{font-size:10px;color:var(--muted);padding:4px 0;}
+</style>
+</head>
+<body>
+
+<!-- BRAND BAR -->
+<div class="brand-bar">
+  <div class="brand-icon-wrap">
+    <img src="Avatar Logo.svg" alt="Avatar Learning Center">
+  </div>
+  <div class="brand-spacer"></div>
+  <div class="brand-title">
+    Avatar Learning Center &nbsp;<span class="brand-sep">◆</span>&nbsp; Class Scheduler
+    <span class="brand-sub">Weekly Class Schedule</span>
+  </div>
+  <div class="brand-spacer"></div>
+</div>
+
+<!-- CONFIG BAR -->
+<div class="config-bar">
+  <label>Time range:
+    <input type="time" id="cfg-start" value="16:00" onchange="applyConfig()">
+    &nbsp;to&nbsp;
+    <input type="time" id="cfg-end" value="20:00" onchange="applyConfig()">
+  </label>
+  <div class="vdiv"></div>
+  <span>15-min slots</span>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <span class="tool-label">Classes</span>
+  <div class="chips-row" id="class-chips"></div>
+  <button class="btn sec" onclick="openManageClasses()">&#9998; Edit</button>
+  <div class="vdiv"></div>
+  <span class="tool-label">Teachers</span>
+  <div class="chips-row" id="teacher-chips"></div>
+  <button class="btn sec" onclick="openManageTeachers()">&#9998; Edit</button>
+</div>
+
+<!-- SCHEDULE -->
+<div class="schedule-wrap">
+  <div class="schedule-grid" id="schedule-grid"></div>
+</div>
+
+<div id="toast"></div>
+
+<!-- SESSION MODAL -->
+<div class="overlay" id="sess-overlay">
+  <div class="modal">
+    <h3 id="sess-title">Schedule Class</h3>
+    <div class="time-info" id="sess-time-info"></div>
+    <div class="field">
+      <label>Class</label>
+      <select id="sess-class"></select>
+    </div>
+    <div class="field">
+      <label>Teacher</label>
+      <select id="sess-teacher"></select>
+    </div>
+    <div class="field">
+      <label>Duration</label>
+      <div class="dur-row">
+        <div class="dur-btn" data-dur="60" onclick="pickDur(this)">1 hr</div>
+        <div class="dur-btn" data-dur="90" onclick="pickDur(this)">1.5 hr</div>
+        <div class="dur-btn" data-dur="120" onclick="pickDur(this)">2 hr</div>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="btn sec" onclick="closeSessModal()">Cancel</button>
+      <button class="btn danger" id="sess-del-btn" onclick="deleteSession()" style="display:none">Delete</button>
+      <button class="btn" onclick="saveSession()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE CLASSES MODAL -->
+<div class="overlay" id="cls-overlay">
+  <div class="modal">
+    <h3>Manage Classes</h3>
+    <div class="manage-list" id="cls-list"></div>
+    <button class="btn sec" style="width:100%" onclick="addClassRow()">+ Add Class</button>
+    <div class="modal-acts">
+      <button class="btn sec" onclick="document.getElementById('cls-overlay').classList.remove('open')">Cancel</button>
+      <button class="btn" onclick="saveClasses()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE TEACHERS MODAL -->
+<div class="overlay" id="tch-overlay">
+  <div class="modal">
+    <h3>Manage Teachers</h3>
+    <div class="manage-list" id="tch-list"></div>
+    <button class="btn sec" style="width:100%" onclick="addTeacherRow()">+ Add Teacher</button>
+    <div class="modal-acts">
+      <button class="btn sec" onclick="document.getElementById('tch-overlay').classList.remove('open')">Cancel</button>
+      <button class="btn" onclick="saveTeachers()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONSTANTS & STATE
+// ══════════════════════════════════════════
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const PALETTE=['#2E68A1','#3a8f2a','#d42b20','#c49a00','#7b3fa0','#d4620a','#1a8a8a','#c44a8a','#557a00','#1a6a6a'];
+const LANE_H=58, LANE_PAD=5;
+
+let cfg={startTime:'16:00',endTime:'20:00'};
+let classes=[
+  {id:1,name:'Math 1A',color:'#2E68A1'},
+  {id:2,name:'Math 1B',color:'#3a8f2a'},
+];
+let teachers=[{id:1,name:'Teacher 1'}];
+let sessions=[];
+let nextCid=3,nextTid=2,nextSid=1;
+
+// GitHub sync
+const GH_OWNER='avatarmath-llc',GH_REPO='curriculum-planning-tool',GH_FILE='schedule-data.json';
+const GH_RAW=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
+const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+let ghTimer=null;
+
+// ══════════════════════════════════════════
+// TIME HELPERS
+// ══════════════════════════════════════════
+function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function toTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
+function fmt(m){const h=Math.floor(m/60),mn=m%60,ap=h>=12?'PM':'AM',h12=h%12||12;return`${h12}:${String(mn).padStart(2,'0')} ${ap}`;}
+function slotInfo(){
+  const s=toMin(cfg.startTime),e=toMin(cfg.endTime),tot=e-s,n=Math.round(tot/15);
+  return{s,e,tot,n};
+}
+
+// ══════════════════════════════════════════
+// PERSIST
+// ══════════════════════════════════════════
+function pack(){return{cfg,classes,teachers,sessions,nextCid,nextTid,nextSid};}
+function unpack(d){
+  if(!d)return;
+  if(d.cfg)cfg=d.cfg;
+  if(d.classes)classes=d.classes;
+  if(d.teachers)teachers=d.teachers;
+  if(d.sessions)sessions=d.sessions;
+  if(d.nextCid)nextCid=d.nextCid;
+  if(d.nextTid)nextTid=d.nextTid;
+  if(d.nextSid)nextSid=d.nextSid;
+}
+function save(){
+  try{localStorage.setItem('alc_sched_v1',JSON.stringify(pack()));}catch(e){}
+  clearTimeout(ghTimer);ghTimer=setTimeout(ghSync,600);
+}
+async function ghSync(){
+  const pat=localStorage.getItem('gh_pat');if(!pat)return;
+  try{
+    let sha;const r=await fetch(GH_API,{headers:{Authorization:'token '+pat}});
+    if(r.ok)sha=(await r.json()).sha;
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(pack(),null,2))));
+    await fetch(GH_API,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json'},
+      body:JSON.stringify({sha,message:'Update schedule',content})});
+  }catch(e){}
+}
+async function init(){
+  const loc=localStorage.getItem('alc_sched_v1');
+  if(loc){try{unpack(JSON.parse(loc));}catch(e){}}
+  render();
+  try{
+    const r=await fetch(GH_RAW+'?t='+Date.now());
+    if(r.ok){unpack(await r.json());save();render();}
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function render(){
+  document.getElementById('cfg-start').value=cfg.startTime;
+  document.getElementById('cfg-end').value=cfg.endTime;
+  renderChips();
+  renderGrid();
+}
+
+function renderChips(){
+  document.getElementById('class-chips').innerHTML=
+    classes.map(c=>`<div class="class-chip"><div class="chip-dot" style="background:${c.color}"></div>${esc(c.name)}</div>`).join('');
+  document.getElementById('teacher-chips').innerHTML=
+    teachers.map(t=>`<div class="class-chip">${esc(t.name)}</div>`).join('');
+}
+
+function renderGrid(){
+  const{s:startMin,tot,n:numSlots}=slotInfo();
+  const grid=document.getElementById('schedule-grid');
+  let html='';
+
+  // ── Ruler
+  html+=`<div class="ruler-row"><div style="width:var(--label-w)"></div><div class="ruler-inner" style="position:relative">`;
+  for(let i=0;i<=numSlots;i++){
+    const m=startMin+i*15,isHour=m%60===0,pct=(i/numSlots*100).toFixed(3);
+    if(i<numSlots)html+=`<div class="ruler-slot${isHour?' hour':''}" style="left:${pct}%;width:${(100/numSlots).toFixed(3)}%"></div>`;
+    if(isHour||m%30===0)html+=`<span class="ruler-label" style="left:${pct}%">${fmt(m)}</span>`;
+  }
+  html+=`</div></div>`;
+
+  // ── Day rows
+  DAYS.forEach(day=>{
+    const daySess=sessions.filter(s=>s.day===day);
+    assignLanes(daySess);
+    const numLanes=daySess.length?Math.max(...daySess.map(s=>s.lane))+1:1;
+    const canvasH=numLanes*LANE_H;
+
+    html+=`<div class="day-row">`;
+    html+=`<div class="day-label-cell">${day.slice(0,3)}</div>`;
+    html+=`<div class="day-canvas" id="cv-${day}" data-day="${day}" style="height:${canvasH}px" onmousedown="dragStart(event,'${day}')">`;
+
+    // Slot lines
+    for(let i=1;i<numSlots;i++){
+      const m=startMin+i*15,isHour=m%60===0;
+      html+=`<div class="slot-line${isHour?' hour':''}" style="left:${(i/numSlots*100).toFixed(3)}%"></div>`;
+    }
+
+    // Sessions
+    daySess.forEach(s=>{
+      const cls=classes.find(c=>c.id===s.classId);
+      const tch=teachers.find(t=>t.id===s.teacherId);
+      if(!cls)return;
+      const left=((s.startMin-startMin)/tot*100).toFixed(3);
+      const width=(s.durationMin/tot*100).toFixed(3);
+      const top=s.lane*LANE_H+LANE_PAD;
+      const h=LANE_H-LANE_PAD*2;
+      const end=s.startMin+s.durationMin;
+      html+=`<div class="session-block" data-id="${s.id}"
+        style="left:${left}%;width:${width}%;top:${top}px;height:${h}px;background:${cls.color}"
+        onmousedown="e=>{e.stopPropagation();}" onclick="sessClick(event,${s.id})">
+        <div class="sb-name">${esc(cls.name)}</div>
+        <div class="sb-time">${fmt(s.startMin)}–${fmt(end)}</div>
+        ${tch?`<div class="sb-teacher">${esc(tch.name)}</div>`:''}
+      </div>`;
+    });
+
+    html+=`</div></div>`;
+  });
+
+  grid.innerHTML=html;
+}
+
+function assignLanes(sess){
+  const sorted=[...sess].sort((a,b)=>a.startMin-b.startMin);
+  const ends=[];
+  sorted.forEach(s=>{
+    let lane=ends.findIndex(e=>e<=s.startMin);
+    if(lane===-1)lane=ends.length;
+    s.lane=lane;
+    ends[lane]=s.startMin+s.durationMin;
+  });
+}
+
+// ══════════════════════════════════════════
+// DRAG TO SCHEDULE
+// ══════════════════════════════════════════
+let drag=null;
+
+function dragStart(e,day){
+  if(e.target.closest('.session-block'))return;
+  e.preventDefault();
+  const cv=document.getElementById('cv-'+day);
+  const rect=cv.getBoundingClientRect();
+  const{s:startMin,tot}=slotInfo();
+  const pct=(e.clientX-rect.left)/rect.width;
+  const raw=Math.round(pct*tot/15)*15;
+  const clipped=Math.max(0,Math.min(raw,tot-60));
+  drag={day,cv,rect,startMin:startMin+clipped,dur:60};
+
+  const prev=document.createElement('div');
+  prev.className='drag-preview';prev.id='dp';
+  cv.appendChild(prev);
+  updatePreview();
+
+  window.addEventListener('mousemove',dragMove);
+  window.addEventListener('mouseup',dragEnd);
+}
+
+function dragMove(e){
+  if(!drag)return;
+  const{s:startMin,tot}=slotInfo();
+  const rect=drag.cv.getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  const curMin=startMin+Math.round(pct*tot/15)*15;
+  const raw=curMin-drag.startMin;
+  drag.dur=raw>=105?120:raw>=75?90:60;
+  updatePreview();
+}
+
+function updatePreview(){
+  const{s:startMin,tot}=slotInfo();
+  const p=document.getElementById('dp');
+  if(!p||!drag)return;
+  p.style.left=((drag.startMin-startMin)/tot*100).toFixed(3)+'%';
+  p.style.width=(drag.dur/tot*100).toFixed(3)+'%';
+}
+
+function dragEnd(){
+  window.removeEventListener('mousemove',dragMove);
+  window.removeEventListener('mouseup',dragEnd);
+  const p=document.getElementById('dp');if(p)p.remove();
+  if(!drag)return;
+  const d=drag;drag=null;
+  openSessModal(null,d.day,d.startMin,d.dur);
+}
+
+// ══════════════════════════════════════════
+// SESSION MODAL
+// ══════════════════════════════════════════
+let editSess=null,pendDay,pendStart,pendDur;
+
+function openSessModal(id,day,startMin,dur){
+  editSess=id!=null?sessions.find(s=>s.id===id):null;
+  pendDay=day; pendStart=startMin; pendDur=dur||60;
+  if(editSess){pendStart=editSess.startMin;pendDur=editSess.durationMin;}
+
+  document.getElementById('sess-title').textContent=editSess?'Edit Session':'Schedule Class';
+  document.getElementById('sess-del-btn').style.display=editSess?'':'none';
+
+  const cs=document.getElementById('sess-class');
+  cs.innerHTML=classes.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  if(editSess)cs.value=editSess.classId;
+
+  const ts=document.getElementById('sess-teacher');
+  ts.innerHTML='<option value="">— no teacher —</option>'+teachers.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
+  if(editSess&&editSess.teacherId)ts.value=editSess.teacherId;
+
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.toggle('active',+b.dataset.dur===pendDur));
+  updateTimeInfo();
+  document.getElementById('sess-overlay').classList.add('open');
+}
+
+function updateTimeInfo(){
+  const d=editSess?editSess.day:pendDay;
+  document.getElementById('sess-time-info').textContent=`${d}  •  ${fmt(pendStart)} – ${fmt(pendStart+pendDur)}`;
+}
+
+function pickDur(btn){
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  pendDur=+btn.dataset.dur;
+  updateTimeInfo();
+}
+
+function closeSessModal(){document.getElementById('sess-overlay').classList.remove('open');}
+
+function saveSession(){
+  const cid=+document.getElementById('sess-class').value;
+  const tv=document.getElementById('sess-teacher').value;
+  const tid=tv?+tv:null;
+  const day=editSess?editSess.day:pendDay;
+  if(editSess){
+    editSess.classId=cid;editSess.teacherId=tid;editSess.durationMin=pendDur;
+  }else{
+    sessions.push({id:nextSid++,day,classId:cid,teacherId:tid,startMin:pendStart,durationMin:pendDur,lane:0});
+  }
+  closeSessModal();save();render();toast('Saved');
+}
+
+function deleteSession(){
+  if(!editSess)return;
+  sessions=sessions.filter(s=>s.id!==editSess.id);
+  closeSessModal();save();render();toast('Removed');
+}
+
+function sessClick(e,id){
+  e.stopPropagation();
+  const s=sessions.find(x=>x.id===id);
+  if(s)openSessModal(s.id,s.day,s.startMin,s.durationMin);
+}
+
+// ══════════════════════════════════════════
+// MANAGE CLASSES
+// ══════════════════════════════════════════
+let tmpCls=[];
+
+function openManageClasses(){
+  tmpCls=classes.map(c=>({...c}));
+  renderClsList();
+  document.getElementById('cls-overlay').classList.add('open');
+}
+function renderClsList(){
+  document.getElementById('cls-list').innerHTML=tmpCls.map((c,i)=>`
+    <div class="manage-item">
+      <input type="color" value="${c.color}" style="width:28px;height:28px;border:none;cursor:pointer;border-radius:50%;padding:0;background:none;flex-shrink:0"
+        oninput="tmpCls[${i}].color=this.value">
+      <input type="text" value="${esc(c.name)}" oninput="tmpCls[${i}].name=this.value" placeholder="Class name">
+      <button class="del-btn" onclick="tmpCls.splice(${i},1);renderClsList()">&#10005;</button>
+    </div>`).join('');
+}
+function addClassRow(){
+  tmpCls.push({id:nextCid++,name:'New Class',color:PALETTE[tmpCls.length%PALETTE.length]});
+  renderClsList();
+}
+function saveClasses(){
+  classes=tmpCls.filter(c=>c.name.trim());
+  document.getElementById('cls-overlay').classList.remove('open');
+  save();render();
+}
+
+// ══════════════════════════════════════════
+// MANAGE TEACHERS
+// ══════════════════════════════════════════
+let tmpTch=[];
+
+function openManageTeachers(){
+  tmpTch=teachers.map(t=>({...t}));
+  renderTchList();
+  document.getElementById('tch-overlay').classList.add('open');
+}
+function renderTchList(){
+  document.getElementById('tch-list').innerHTML=tmpTch.map((t,i)=>`
+    <div class="manage-item">
+      <input type="text" value="${esc(t.name)}" oninput="tmpTch[${i}].name=this.value" placeholder="Teacher name">
+      <button class="del-btn" onclick="tmpTch.splice(${i},1);renderTchList()">&#10005;</button>
+    </div>`).join('');
+}
+function addTeacherRow(){
+  tmpTch.push({id:nextTid++,name:'New Teacher'});
+  renderTchList();
+}
+function saveTeachers(){
+  teachers=tmpTch.filter(t=>t.name.trim());
+  document.getElementById('tch-overlay').classList.remove('open');
+  save();render();
+}
+
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+function applyConfig(){
+  cfg.startTime=document.getElementById('cfg-start').value;
+  cfg.endTime=document.getElementById('cfg-end').value;
+  save();render();
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let toastT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+
+document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+
+init();
+</script>
+</body>
+</html>

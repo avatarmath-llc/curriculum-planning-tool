@@ -112,7 +112,7 @@
       "id": 9,
       "day": "Thursday",
       "classId": 6,
-      "teacherId": null,
+      "teacherId": 1,
       "startMin": 1005,
       "durationMin": 60,
       "lane": 0

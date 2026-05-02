@@ -350,7 +350,7 @@ function save(){
   clearTimeout(ghTimer);ghTimer=setTimeout(ghSync,600);
 }
 async function ghSync(){
-  const pat=localStorage.getItem('gh_pat');if(!pat)return;
+  const pat=(localStorage.getItem('gh_pat')||'').replace(/[^\x20-\x7E]/g,'').trim();if(!pat)return;
   updateGhStatus('saving');
   try{
     let sha;
@@ -378,7 +378,7 @@ function openGhModal(){
   setTimeout(()=>document.getElementById('gh-token-input').focus(),60);
 }
 function saveGhPat(){
-  const t=document.getElementById('gh-token-input').value.trim();
+  const t=document.getElementById('gh-token-input').value.replace(/[^\x20-\x7E]/g,'').trim();
   if(!t){document.getElementById('gh-token-input').focus();return;}
   try{localStorage.setItem('gh_pat',t);}catch(e){}
   document.getElementById('gh-overlay').classList.remove('open');

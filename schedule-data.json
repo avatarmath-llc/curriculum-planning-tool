@@ -1,0 +1,105 @@
+{
+  "cfg": {
+    "startTime": "15:45",
+    "endTime": "21:15",
+    "slotMin": 15
+  },
+  "classes": [
+    {
+      "id": 1,
+      "name": "Math 1A",
+      "color": "#2E68A1"
+    },
+    {
+      "id": 2,
+      "name": "Math 1B",
+      "color": "#3a8f2a"
+    },
+    {
+      "id": 3,
+      "name": "Math 2A",
+      "color": "#d42b20"
+    },
+    {
+      "id": 4,
+      "name": "Math 2B",
+      "color": "#c49a00"
+    },
+    {
+      "id": 5,
+      "name": "Math 3A",
+      "color": "#7b3fa0"
+    },
+    {
+      "id": 6,
+      "name": "Math 3B",
+      "color": "#d4620a"
+    },
+    {
+      "id": 7,
+      "name": "Math 4A",
+      "color": "#1a8a8a"
+    },
+    {
+      "id": 8,
+      "name": "Math 4B",
+      "color": "#c44a8a"
+    },
+    {
+      "id": 9,
+      "name": "Math 5A",
+      "color": "#557a00"
+    },
+    {
+      "id": 10,
+      "name": "Math 5B",
+      "color": "#1a6a6a"
+    },
+    {
+      "id": 11,
+      "name": "Math 6A",
+      "color": "#2E68A1"
+    },
+    {
+      "id": 12,
+      "name": "Math 6B",
+      "color": "#3a8f2a"
+    },
+    {
+      "id": 13,
+      "name": "Pre-Alg A",
+      "color": "#d42b20"
+    },
+    {
+      "id": 14,
+      "name": "Pre-Alg B",
+      "color": "#c49a00"
+    },
+    {
+      "id": 15,
+      "name": "Alg 1",
+      "color": "#7b3fa0"
+    },
+    {
+      "id": 16,
+      "name": "Geo",
+      "color": "#d4620a"
+    },
+    {
+      "id": 17,
+      "name": "Alg 2",
+      "color": "#1a8a8a"
+    }
+  ],
+  "teachers": [
+    {
+      "id": 1,
+      "name": "Teacher 1",
+      "color": "#2E68A1"
+    }
+  ],
+  "sessions": [],
+  "nextCid": 18,
+  "nextTid": 2,
+  "nextSid": 8
+}

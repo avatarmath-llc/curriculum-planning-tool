@@ -1,1088 +1,180 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Avatar Learning Center – K–12 Math Curriculum</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Avatar Learning Center — Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
-
-/* ══ THEME TOKENS ══ */
-[data-theme="dark"] {
-  --primary:#2E68A1; --primary-lt:#5AACCF;
-  --bg:#0d1f35; --surface:#142d4e; --surface2:#1a3a5c;
-  --border:#2E68A1; --border2:#5AACCF;
-  --ink:#f0f6fb; --muted:#8bccc8; --faint:#1a3558;
-  --row-hover:#1a3a5c; --hint-bg:#0b1a2c; --hint-color:#8bccc8;
-  --leg-bg:#1a3a5c; --thead-bg:#0d1f35; --row-border:#2E68A1;
-  --cell-hover:rgba(255,255,255,0.05); --paint-hover:rgba(255,255,255,0.08);
-  --modal-bg:rgba(0,0,0,0.75); --toast-bg:#1a3a5c; --toast-color:#f0f6fb;
-  --footer-bg:#0d1f35; --sel-outline:#fff; --sel-glow:rgba(255,255,255,0.15);
-  --eraser-bg:#1a3558; --eraser-bd:#5AACCF; --eraser-c:#8bccc8;
-  --I:#5AACCF; --C:#81c171; --M:#f53a33; --R:#fddd54; --R-text:#1a3558;
-  --btn-bg:#1a3a5c; --btn-hov:#1a3558;
-  --btn-g-bg:#81c17122; --btn-g-bd:#81c17166; --btn-g-c:#81c171; --btn-g-hov:#81c17133;
-  --btn-y-bg:#fddd5422; --btn-y-bd:#fddd5466; --btn-y-c:#fddd54; --btn-y-hov:#fddd5433;
-  --btn-r-bg:#f53a3322; --btn-r-bd:#f53a3366; --btn-r-c:#f53a33; --btn-r-hov:#f53a3333;
-  --swatch-sel:white; --modal-h2:#EDED95; --shadow:0 1px 4px rgba(0,0,0,0.4);
-  --filter-bg:#0e2240; --grade-sel-bg:#2E68A1; --grade-sel-c:#fff;
-  --grade-nbr-bg:#1a3a5c; --grade-nbr-c:#8bccc8;
-  --col-dimmed:0.18; --col-focus-bg:rgba(90,172,207,0.08);
-  --search-bg:#0d1f35; --domain-chip-bg:#1a3a5c; --domain-chip-sel:#2E68A1;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#2E68A1;--primary-lt:#5AACCF;
+  --bg:#f0f5fb;--surface:#fff;--surface2:#e8f0f8;
+  --border:#c2d8ee;--ink:#1a2c40;--muted:#6a8aab;
+  --gold:#c9a83c;
 }
-[data-theme="light"] {
-  --primary:#2E68A1; --primary-lt:#5AACCF;
-  --bg:#f4f7fb; --surface:#fff; --surface2:#e8f0f8;
-  --border:#c2d8ee; --border2:#5AACCF;
-  --ink:#1a2e42; --muted:#5a7fa0; --faint:#ddeaf6;
-  --row-hover:#edf4fb; --hint-bg:#e0ecf7; --hint-color:#3a6080;
-  --leg-bg:#edf4fb; --thead-bg:#f4f7fb; --row-border:#d8e8f5;
-  --cell-hover:rgba(46,104,161,0.06); --paint-hover:rgba(46,104,161,0.10);
-  --modal-bg:rgba(26,65,113,0.45); --toast-bg:#1a4171; --toast-color:#fff;
-  --footer-bg:#edf4fb; --sel-outline:#2E68A1; --sel-glow:rgba(46,104,161,0.2);
-  --eraser-bg:#e0ecf7; --eraser-bd:#5AACCF; --eraser-c:#5a7fa0;
-  --I:#2E68A1; --C:#3a8f2a; --M:#d42b20; --R:#c49a00; --R-text:#5a3e00;
-  --btn-bg:#e8f0f8; --btn-hov:#d0e4f4;
-  --btn-g-bg:#e8f6e4; --btn-g-bd:#3a8f2a; --btn-g-c:#2a6e1a; --btn-g-hov:#d4eece;
-  --btn-y-bg:#fdf6dc; --btn-y-bd:#c49a00; --btn-y-c:#7a5f00; --btn-y-hov:#f7ecb8;
-  --btn-r-bg:#fde8e7; --btn-r-bd:#d42b20; --btn-r-c:#a01a14; --btn-r-hov:#fbd4d2;
-  --swatch-sel:#1a4171; --modal-h2:#2E68A1; --shadow:0 1px 4px rgba(46,104,161,0.10);
-  --filter-bg:#e4eef8; --grade-sel-bg:#2E68A1; --grade-sel-c:#fff;
-  --grade-nbr-bg:#d0e4f4; --grade-nbr-c:#2E68A1;
-  --col-dimmed:0.12; --col-focus-bg:rgba(46,104,161,0.06);
-  --search-bg:#fff; --domain-chip-bg:#e8f0f8; --domain-chip-sel:#2E68A1;
-}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
 
-/* ══ BASE ══ */
-*{box-sizing:border-box;margin:0;padding:0;}
-html{transition:background .25s;}
-body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;min-height:100vh;transition:background .25s,color .25s;}
-
-/* ══ BRAND BAR ══ */
-.brand-bar{background:linear-gradient(120deg,#19416f 0%,#2d67a0 55%,#3a7ab8 100%);padding:10px 20px;display:flex;align-items:center;gap:14px;border-bottom:4px solid #c9a83c;flex-wrap:wrap;box-shadow:0 3px 12px rgba(0,0,0,.35);}
-.brand-logo{width:40px;height:40px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--primary);flex-shrink:0;letter-spacing:-1px;}
-.brand-name{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:white;line-height:1.15;}
-.brand-name span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-top:1px;}
-.brand-url{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.05em;}
+/* ── BRAND BAR ── */
+.brand-bar{background:linear-gradient(120deg,#19416f 0%,#2d67a0 55%,#3a7ab8 100%);padding:10px 24px;display:flex;align-items:center;gap:16px;border-bottom:4px solid var(--gold);box-shadow:0 3px 16px rgba(0,0,0,.35);}
+.brand-icon-wrap{width:54px;height:54px;overflow:hidden;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.35);flex-shrink:0;}
+.brand-icon-wrap img{height:98px;width:auto;display:block;margin-top:-10px;margin-left:-17px;}
 .brand-spacer{flex:1;}
-.brand-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);white-space:nowrap;}
-.brand-sub{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;white-space:nowrap;}
-.brand-sep{font-size:.85rem;color:#c9a83c;vertical-align:middle;}
-.theme-toggle{display:flex;align-items:center;background:rgba(0,0,0,.25);border-radius:20px;padding:3px;border:1px solid rgba(255,255,255,.2);flex-shrink:0;}
-.theme-btn{padding:4px 12px;border-radius:16px;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;transition:background .2s,color .2s;display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.6);background:transparent;}
-.theme-btn.active{background:white;color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,.3);}
-.theme-btn:hover:not(.active){color:white;background:rgba(255,255,255,.12);}
+.brand-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.25);white-space:nowrap;}
+.brand-sub{display:block;font-size:.62rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.12em;margin-top:4px;text-transform:uppercase;}
+.brand-sep{font-size:.9rem;color:var(--gold);vertical-align:middle;}
 
-/* ══ TOOLBAR ══ */
-.toolbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow);transition:background .25s,border-color .25s;}
-.t-sep{width:1px;height:28px;background:var(--border);flex-shrink:0;}
-.t-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
-.pal-dot{width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white;transition:transform .12s,box-shadow .12s;user-select:none;}
-.pal-dot:hover{transform:scale(1.15);box-shadow:0 3px 10px rgba(0,0,0,.4);}
-.pal-dot.selected{outline:2.5px solid var(--sel-outline);outline-offset:2px;transform:scale(1.2);box-shadow:0 0 0 5px var(--sel-glow);}
-.pal-dot[data-type="I"]{background:var(--I);}
-.pal-dot[data-type="C"]{background:var(--C);}
-.pal-dot[data-type="M"]{background:var(--M);}
-.pal-dot[data-type="R"]{background:var(--R);color:var(--R-text);}
-.pal-dot[data-type="X"]{background:var(--eraser-bg);border:1px dashed var(--eraser-bd);color:var(--eraser-c);font-size:13px;}
-.btn{padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:var(--btn-bg);color:var(--ink);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:background .15s;white-space:nowrap;}
-.btn:hover{background:var(--btn-hov);}
-.btn-g{background:var(--btn-g-bg);border-color:var(--btn-g-bd);color:var(--btn-g-c);} .btn-g:hover{background:var(--btn-g-hov);}
-.btn-y{background:var(--btn-y-bg);border-color:var(--btn-y-bd);color:var(--btn-y-c);} .btn-y:hover{background:var(--btn-y-hov);}
-.btn-r{background:var(--btn-r-bg);border-color:var(--btn-r-bd);color:var(--btn-r-c);} .btn-r:hover{background:var(--btn-r-hov);}
+/* ── HERO ── */
+.hero{text-align:center;padding:52px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.hero-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--primary);letter-spacing:.02em;}
+.hero-sub{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+.hero-divider{width:60px;height:3px;background:linear-gradient(90deg,var(--primary-lt),var(--gold));border-radius:2px;margin-top:4px;}
 
-/* ══ FILTER BAR ══ */
-.filter-bar{background:var(--filter-bg);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;flex-direction:column;gap:8px;transition:background .25s;}
-.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.filter-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;min-width:52px;}
+/* ── CARDS GRID ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding:0 32px 60px;max-width:1100px;margin:0 auto;width:100%;}
 
-/* Grade pills */
-.grade-pills{display:flex;gap:4px;flex-wrap:wrap;}
-.grade-pill{min-width:28px;height:24px;padding:0 6px;border-radius:12px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;font-weight:500;cursor:pointer;transition:background .15s,color .15s,border-color .15s;display:flex;align-items:center;justify-content:center;}
-.grade-pill:hover{border-color:var(--primary-lt);color:var(--ink);}
-.grade-pill.selected{background:var(--grade-sel-bg);color:var(--grade-sel-c);border-color:var(--grade-sel-bg);}
-.grade-pill.neighbor{background:var(--grade-nbr-bg);color:var(--grade-nbr-c);border-color:var(--border2);}
+.card{background:var(--surface);border-radius:14px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(46,104,161,.08);display:flex;flex-direction:column;overflow:hidden;transition:transform .18s,box-shadow .18s;}
+.card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(46,104,161,.18);}
 
+.card-header{padding:22px 24px 18px;display:flex;align-items:flex-start;gap:14px;border-bottom:1px solid var(--border);}
+.card-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.card-head-text{flex:1;}
+.card-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.card-tag{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
 
-/* Domain chips */
-.domain-chips{display:flex;gap:5px;flex-wrap:wrap;}
-.domain-chip{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--domain-chip-bg);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;}
-.domain-chip:hover{color:var(--ink);}
-.domain-chip.selected{background:var(--domain-chip-sel);color:white;border-color:var(--domain-chip-sel);}
+.card-body{padding:18px 24px;flex:1;display:flex;flex-direction:column;gap:10px;}
+.card-desc{font-size:10.5px;color:var(--muted);line-height:1.65;}
+.feature-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.feature-list li{font-size:10px;color:var(--ink);display:flex;align-items:center;gap:7px;}
+.feature-list li::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 
-/* Search */
-.search-wrap{position:relative;flex:1;min-width:160px;max-width:280px;}
-.search-wrap input{width:100%;padding:5px 10px 5px 28px;border-radius:16px;border:1px solid var(--border2);background:var(--search-bg);color:var(--ink);font-family:'DM Mono',monospace;font-size:11px;outline:none;transition:border-color .15s;}
-.search-wrap input:focus{border-color:var(--primary-lt);}
-.search-wrap::before{content:'⌕';position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
-.search-wrap input::placeholder{color:var(--muted);}
+.card-footer{padding:14px 24px 20px;}
+.open-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border-radius:8px;border:none;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .15s,transform .1s;}
+.open-btn:hover{transform:scale(1.02);}
+.open-btn .arrow{font-size:14px;transition:transform .15s;}
+.open-btn:hover .arrow{transform:translateX(3px);}
 
-/* View mode toggle */
-.view-btns{display:flex;gap:0;border:1px solid var(--border2);border-radius:6px;overflow:hidden;flex-shrink:0;}
-.view-btn{padding:4px 10px;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:background .15s,color .15s;}
-.view-btn.active{background:var(--primary);color:white;}
-.view-btn:hover:not(.active){color:var(--ink);}
+/* Card color themes */
+.card-1 .card-icon{background:#e8f0f8;}
+.card-1 .feature-list li::before{background:#2E68A1;}
+.card-1 .open-btn{background:linear-gradient(135deg,#2E68A1,#3a7ab8);color:white;}
+.card-1 .open-btn:hover{background:linear-gradient(135deg,#1a4a7a,#2E68A1);}
 
-/* Clear filter btn */
-.clear-filter{font-size:10px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'DM Mono',monospace;padding:0;}
-.clear-filter:hover{color:var(--ink);}
+.card-2 .card-icon{background:#edf7ed;}
+.card-2 .feature-list li::before{background:#3a8f2a;}
+.card-2 .open-btn{background:linear-gradient(135deg,#3a8f2a,#4aaf38);color:white;}
+.card-2 .open-btn:hover{background:linear-gradient(135deg,#287020,#3a8f2a);}
 
-/* ══ LEGEND + HINT ══ */
-.legend-bar{display:flex;gap:14px;padding:5px 16px;border-bottom:1px solid var(--border);background:var(--leg-bg);flex-wrap:wrap;align-items:center;transition:background .25s;}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;}
-.leg-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:white;font-weight:600;}
+.card-3 .card-icon{background:#f7f0f7;}
+.card-3 .feature-list li::before{background:#7b3fa0;}
+.card-3 .open-btn{background:linear-gradient(135deg,#7b3fa0,#9b5fc0);color:white;}
+.card-3 .open-btn:hover{background:linear-gradient(135deg,#5c2d7a,#7b3fa0);}
 
-
-/* ══ TABLE ══ */
-.table-wrap{overflow-x:auto;padding:12px 16px 80px;}
-table{border-collapse:collapse;min-width:980px;width:100%;}
-thead th{position:sticky;top:0;background:var(--thead-bg);padding:7px 3px 5px;text-align:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;z-index:10;transition:background .25s,opacity .2s;}
-thead th:first-child{text-align:left;padding-left:6px;width:420px;min-width:380px;}
-.th-sub{display:block;font-size:8px;letter-spacing:.02em;text-transform:none;font-style:italic;color:var(--primary-lt);margin-top:1px;font-weight:400;}
-th.band,td.band{border-left:1px dashed var(--border);}
-
-/* Grade column states */
-th.col-active,td.col-active{background:var(--col-focus-bg);}
-th.col-dimmed{opacity:var(--col-dimmed);}
-td.col-dimmed .cell-dot{opacity:var(--col-dimmed);}
-td.col-dimmed{cursor:default!important;}
-th.col-hidden,td.col-hidden{display:none!important;}
-
-tr.domain-row td{padding:12px 8px 4px;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:white;border-bottom:1px solid;}
-.domain-acts{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
-.icon-btn{width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,.15);border:none;color:white;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:background .12s;}
-.icon-btn:hover{background:rgba(255,255,255,.3);}
-
-tr.topic-row{border-bottom:1px solid var(--row-border);transition:background .1s,opacity .2s;}
-tr.topic-row:hover{background:var(--row-hover);}
-tr.topic-row.row-hidden{display:none;}
-tr.topic-row.row-dimmed{opacity:.25;}
-tr.domain-row.domain-hidden{display:none;}
-td:first-child{padding:4px 6px;line-height:1.35;height:44px;vertical-align:middle;}
-.t-name{display:inline;font-size:13px;color:var(--ink);}
-.t-sub{display:block;font-size:12px;color:var(--muted);font-style:italic;margin-top:1px;}
-.topic-acts{display:inline-flex;gap:3px;vertical-align:middle;margin-left:5px;opacity:0;transition:opacity .15s;}
-tr.topic-row:hover .topic-acts{opacity:1;}
-.search-hl{background:rgba(253,221,84,.35);border-radius:2px;padding:0 1px;}
-
-td.drop-cell{text-align:center;vertical-align:middle;padding:2px 1px;min-width:26px;height:44px;cursor:pointer;position:relative;transition:background .1s;}
-td.drop-cell:hover{background:var(--cell-hover);}
-.cell-dot{width:24px;height:24px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;transition:transform .1s,box-shadow .1s;user-select:none;}
-.cell-dot:hover{transform:scale(1.2);box-shadow:0 2px 8px rgba(0,0,0,.35);}
-.cell-dot[data-type="I"]{background:var(--I);}
-.cell-dot[data-type="C"]{background:var(--C);}
-.cell-dot[data-type="M"]{background:var(--M);}
-.cell-dot[data-type="R"]{background:var(--R);color:var(--R-text);}
-
-td.drop-cell:not(:has(.cell-dot)):not(.col-dimmed):hover::after{content:'+';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--border2);font-size:14px;pointer-events:none;}
-
-/* ══ GRADE INDICATOR ══ */
-function toggleGradeIndicator(){
-  if(selGrades.size===0)return;
-  // Toggle: if currently in col-hidden mode, go back to showing all; if showing all, hide non-selected
-  const anyHidden=document.querySelector('th.col-hidden');
-  if(anyHidden){
-    // Un-hide — clear col-hidden (but keep selection)
-    document.querySelectorAll('.col-hidden').forEach(el=>el.classList.remove('col-hidden'));
-    document.getElementById('sel-grades-indicator').classList.remove('active');
-  }else{
-    // Hide non-selected columns
-    applyFilters();
-    document.getElementById('sel-grades-indicator').classList.add('active');
-  }
-}
-
-function updateGradeIndicator(){
-  const el=document.getElementById('sel-grades-label');
-  const ind=document.getElementById('sel-grades-indicator');
-  if(!el||!ind)return;
-  if(selGrades.size===0){
-    el.textContent='No grades selected';
-    ind.style.cursor='default';
-    ind.title='Select grade pills above to filter columns';
-    ind.classList.remove('active');
-  }else{
-    const labels=[...selGrades].sort((a,b)=>a-b).map(i=>GRADE_LABELS[i]);
-    el.textContent='Gr '+labels.join(', ')+' — click to toggle columns';
-    ind.style.cursor='pointer';
-    ind.title='Click to show/hide only selected grade columns';
-  }
-}
-
-/* ══ TOAST ══ */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--toast-bg);border:1px solid var(--border2);color:var(--toast-color);padding:7px 18px;border-radius:20px;font-size:11px;transition:transform .25s,opacity .25s;opacity:0;pointer-events:none;z-index:500;}
-#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-
-/* ══ MODALS ══ */
-.modal-overlay{display:none;position:fixed;inset:0;background:var(--modal-bg);z-index:400;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:22px;width:min(480px,92vw);display:flex;flex-direction:column;gap:14px;transition:background .25s;}
-.modal.wide{width:min(620px,94vw);}
-.modal h2{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--modal-h2);}
-.modal label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px;}
-.modal input,.modal textarea,.modal select{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:border-color .15s,background .25s;}
-.modal input:focus,.modal textarea:focus,.modal select:focus{border-color:var(--primary-lt);}
-.modal textarea{min-height:70px;resize:vertical;}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;}
-#export-text{min-height:280px;font-size:10px;}
-.color-swatches{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
-.swatch{width:24px;height:24px;border-radius:5px;cursor:pointer;border:2px solid transparent;transition:transform .1s;}
-.swatch:hover{transform:scale(1.15);}
-.swatch.selected{border-color:var(--swatch-sel);box-shadow:0 0 0 2px var(--swatch-sel);}
-
-/* ══ PRINT ══ */
-@media print {
-  .brand-bar,.toolbar,.filter-bar,.legend-bar,footer,#toast,.modal-overlay{display:none!important;}
-  .print-header{display:block!important;}
-  body{background:white;color:black;font-size:10px;}
-  .table-wrap{padding:0;overflow:visible;}
-  table{min-width:unset;width:100%;}
-  thead th{background:white!important;color:#333!important;font-size:9px;}
-  tr.domain-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .cell-dot{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  tr.row-hidden,tr.domain-hidden{display:none!important;}
-  th.col-dimmed,td.col-dimmed,th.col-hidden,td.col-hidden{display:none!important;}
-  th.col-active,td.col-active{background:none!important;}
-}
-.print-header{display:none;padding:8px 0 12px;border-bottom:2px solid #2E68A1;margin-bottom:10px;}
-.print-header h2{font-family:'Playfair Display',serif;font-size:16px;color:#2E68A1;}
-.print-header p{font-size:10px;color:#666;margin-top:3px;}
-
-footer{text-align:center;padding:14px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);letter-spacing:.04em;background:var(--footer-bg);transition:background .25s;}
+/* ── FOOTER ── */
+footer{margin-top:auto;text-align:center;padding:16px;font-size:9.5px;color:var(--muted);letter-spacing:.06em;border-top:1px solid var(--border);}
 footer a{color:var(--primary-lt);text-decoration:none;}
-
-/* ══ CELL PICKER ══ */
-#cell-picker{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:6px 8px;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.28);transition:background .25s;}
-#cell-picker.open{display:flex;}
 </style>
 </head>
 <body>
 
-<!-- PRINT HEADER (visible only when printing) -->
-<div class="print-header" id="print-header">
-  <h2>Avatar Learning Center — K–12 Math Curriculum Map</h2>
-  <p id="print-subtitle">avatarlc.com</p>
-</div>
-
 <!-- BRAND BAR -->
 <div class="brand-bar">
-  <div style="width:52px;height:52px;overflow:hidden;border-radius:7px;box-shadow:0 2px 10px rgba(0,0,0,.35);flex-shrink:0;">
-    <img src="Avatar Logo.svg" alt="Avatar Learning Center" style="height:94px;width:auto;display:block;margin-top:-9px;margin-left:-17px;">
+  <div class="brand-icon-wrap">
+    <img src="Avatar Logo.svg" alt="Avatar Learning Center">
   </div>
   <div class="brand-spacer"></div>
-  <div class="brand-title">Avatar Learning Center &nbsp;<span class="brand-sep">◆</span>&nbsp; Curriculum Planning Tool<span class="brand-sub">K–12 Math Curriculum Map</span></div>
+  <div class="brand-title">
+    Avatar Learning Center &nbsp;<span class="brand-sep">◆</span>&nbsp; Planning Tools
+    <span class="brand-sub">K–12 Math Program</span>
+  </div>
   <div class="brand-spacer"></div>
-  <div class="theme-toggle" role="group" aria-label="Theme">
-    <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">&#9790; Dark</button>
-    <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">&#9788; Light</button>
-  </div>
 </div>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <span class="t-lbl">Add</span>
-  <button class="btn btn-g" onclick="openAddDomain()">+ Domain</button>
-  <button class="btn btn-g" onclick="openAddTopic()">+ Topic</button>
-  <div class="t-sep"></div>
-  <button class="btn btn-y" onclick="openExport()">Export JSON</button>
-  <button class="btn btn-y" onclick="printView()">&#128438; Print</button>
-  <button class="btn btn-r" onclick="resetToDefault()">Reset</button>
-  <div class="t-sep"></div>
-  <button class="btn" id="gh-btn" onclick="openGhModal()" title="Configure GitHub sync">&#9729; Sync</button>
-  <span id="gh-status" style="font-size:10px;color:var(--muted);white-space:nowrap;"></span>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-title">Planning Tools</div>
+  <div class="hero-sub">Select a tool to get started</div>
+  <div class="hero-divider"></div>
 </div>
 
-<!-- FILTER BAR -->
-<div class="filter-bar">
-  <!-- Row 1: Grade range + neighbor toggle + view mode + clear -->
-  <div class="filter-row">
-    <span class="filter-label">Grades</span>
-    <div class="grade-pills" id="grade-pills"></div>
-    <div class="t-sep" style="margin:0 4px;"></div>
-    <span class="filter-label" style="min-width:36px">View</span>
-    <div class="view-btns">
-      <button class="view-btn active" id="vb-all" onclick="setView('all')">All</button>
-      <button class="view-btn" id="vb-only" onclick="setView('only')">Only selected</button>
+<!-- CARDS -->
+<div class="cards">
+
+  <!-- Curriculum Planner -->
+  <div class="card card-1">
+    <div class="card-header">
+      <div class="card-icon">&#128218;</div>
+      <div class="card-head-text">
+        <div class="card-title">Curriculum Planner</div>
+        <div class="card-tag">K–12 Math Curriculum Map</div>
+      </div>
     </div>
-    <button class="clear-filter" onclick="clearAllFilters()">&#10005; Clear filters</button>
-  </div>
-  <!-- Row 2: Domain chips -->
-  <div class="filter-row">
-    <span class="filter-label">Domains</span>
-    <div class="domain-chips" id="domain-chips"></div>
-  </div>
-  <!-- Row 3: Search -->
-  <div class="filter-row">
-    <span class="filter-label">Search</span>
-    <div class="search-wrap">
-      <input type="text" id="search-input" placeholder="e.g. fractions, slope…" oninput="applyFilters()">
+    <div class="card-body">
+      <div class="card-desc">Map math topics across grade levels and track where each concept is introduced, developed, and mastered.</div>
+      <ul class="feature-list">
+        <li>Grades 7–12 across all math domains</li>
+        <li>I / C / M / R dot placement per cell</li>
+        <li>Filter by grade range or domain</li>
+        <li>Search topics &amp; subtopics</li>
+      </ul>
     </div>
-    <span id="filter-count" style="font-size:10px;color:var(--muted);"></span>
-  </div>
-</div>
-
-<!-- LEGEND -->
-<div class="legend-bar">
-  <div class="leg-item"><div class="leg-dot" style="background:var(--I)">I</div>Introduced</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--C)">&#9679;</div>Core focus</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--M)">M</div>Mastery</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--R);color:var(--R-text)">R</div>Review</div>
-
-</div>
-
-<!-- TABLE -->
-<div class="table-wrap">
-  <table>
-    <thead><tr id="thead-row">
-      <th>Topic / Subtopic</th>
-      <th class="band" data-gi="0">K</th><th data-gi="1">1</th><th data-gi="2">2</th>
-      <th class="band" data-gi="3">3</th><th data-gi="4">4</th><th data-gi="5">5</th>
-      <th class="band" data-gi="6">6</th><th data-gi="7">7<span class="th-sub">Pre-Alg</span></th><th data-gi="8">8<span class="th-sub">Alg 1</span></th>
-      <th class="band" data-gi="9">9<span class="th-sub">Geo</span></th><th data-gi="10">10<span class="th-sub">Alg 2</span></th><th data-gi="11">11<span class="th-sub">Pre-C</span></th><th data-gi="12">12<span class="th-sub">Calc</span></th>
-    </tr></thead>
-    <tbody id="tbody"></tbody>
-  </table>
-</div>
-
-<footer>&copy; <span id="yr"></span> <a href="https://avatarlc.com" target="_blank">Avatar Learning Center</a> &nbsp;&middot;&nbsp; Based on Common Core State Standards &nbsp;&middot;&nbsp; <a href="https://corestandards.org" target="_blank">corestandards.org</a></footer>
-<div id="toast"></div>
-<div id="cell-picker">
-  <div class="pal-dot" data-type="I" title="Introduced" onclick="pickCellType('I')">I</div>
-  <div class="pal-dot" data-type="C" title="Core focus" onclick="pickCellType('C')">&#9679;</div>
-  <div class="pal-dot" data-type="M" title="Mastery" onclick="pickCellType('M')">M</div>
-  <div class="pal-dot" data-type="R" title="Review" onclick="pickCellType('R')">R</div>
-  <div class="pal-dot" data-type="X" title="Remove" onclick="pickCellType('X')">&#10005;</div>
-</div>
-
-<!-- MODAL: Topic -->
-<div class="modal-overlay" id="topic-modal">
-  <div class="modal">
-    <h2 id="tm-title">Add Topic</h2>
-    <div><label>Domain</label><select id="tm-domain"></select></div>
-    <div><label>Topic name</label><input id="tm-name" type="text" placeholder="e.g. Polynomial Functions"></div>
-    <div><label>Subtopic / description <small style="color:var(--muted)">(optional)</small></label><input id="tm-sub" type="text" placeholder="e.g. factoring, end behavior"></div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('topic-modal')">Cancel</button>
-      <button class="btn btn-g" id="tm-save" onclick="saveTopic()">Add Topic</button>
+    <div class="card-footer">
+      <a class="open-btn" href="curriculum.html">Open Planner <span class="arrow">&#8594;</span></a>
     </div>
   </div>
-</div>
 
-<!-- MODAL: Domain -->
-<div class="modal-overlay" id="domain-modal">
-  <div class="modal">
-    <h2 id="dm-title">Add Domain</h2>
-    <div><label>Domain name</label><input id="dm-name" type="text" placeholder="e.g. Calculus &amp; Analysis"></div>
-    <div><label>Color</label><div class="color-swatches" id="dm-swatches"></div></div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('domain-modal')">Cancel</button>
-      <button class="btn btn-g" id="dm-save" onclick="saveDomain()">Add Domain</button>
+  <!-- Class Scheduler -->
+  <div class="card card-2">
+    <div class="card-header">
+      <div class="card-icon">&#128197;</div>
+      <div class="card-head-text">
+        <div class="card-title">Class Scheduler</div>
+        <div class="card-tag">Weekly Class Schedule</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Build a weekly class schedule across 7 days with 15-minute time slots. Drag to place and move sessions.</div>
+      <ul class="feature-list">
+        <li>7-day grid with 15-min time slots</li>
+        <li>Drag class chips to schedule</li>
+        <li>Drag sessions to move across days</li>
+        <li>Teacher colors reveal conflicts</li>
+      </ul>
+    </div>
+    <div class="card-footer">
+      <a class="open-btn" href="schedule.html">Open Scheduler <span class="arrow">&#8594;</span></a>
     </div>
   </div>
-</div>
 
-<!-- MODAL: Export -->
-<div class="modal-overlay" id="export-modal">
-  <div class="modal wide">
-    <h2>Export Curriculum JSON</h2>
-    <textarea id="export-text" readonly></textarea>
-    <div class="modal-actions">
-      <button class="btn" onclick="copyExport()">Copy</button>
-      <button class="btn" onclick="closeModal('export-modal')">Close</button>
+  <!-- Lesson Planner -->
+  <div class="card card-3">
+    <div class="card-header">
+      <div class="card-icon">&#128196;</div>
+      <div class="card-head-text">
+        <div class="card-title">Lesson Planner</div>
+        <div class="card-tag">34-Week Pacing Guide</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">Plan lesson topics and subtopics for each class across 34 weeks, organized by semester.</div>
+      <ul class="feature-list">
+        <li>Weeks 1–34 with semester breaks</li>
+        <li>One column per class</li>
+        <li>Topic + subtopic per cell</li>
+        <li>Click any cell to edit inline</li>
+      </ul>
+    </div>
+    <div class="card-footer">
+      <a class="open-btn" href="lesson-plan.html">Open Planner <span class="arrow">&#8594;</span></a>
     </div>
   </div>
+
 </div>
 
-<!-- MODAL: GitHub Sync -->
-<div class="modal-overlay" id="gh-modal">
-  <div class="modal">
-    <h2>&#9729; GitHub Sync</h2>
-    <p style="font-size:11px;color:var(--muted);line-height:1.7">Connect your GitHub account so every Save pushes changes to the shared repo. Changes load automatically for all team members when they open the page.</p>
-    <div><label>Personal Access Token</label><input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off"></div>
-    <div style="background:var(--hint-bg);border-radius:6px;padding:10px 12px;font-size:10px;color:var(--hint-color);line-height:1.8;">
-      <strong>How to get a token:</strong><br>
-      1. GitHub.com → Settings → Developer settings<br>
-      2. Personal access tokens → Fine-grained tokens → Generate new token<br>
-      3. Repository access: <em>Only select repositories</em> → <strong>curriculum-planning-tool</strong><br>
-      4. Repository permissions: <strong>Contents → Read and Write</strong><br>
-      5. Generate token → copy &amp; paste it above
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-r" onclick="clearGhToken()">Disconnect</button>
-      <button class="btn" onclick="closeModal('gh-modal')">Cancel</button>
-      <button class="btn btn-g" onclick="saveGhToken()">Connect</button>
-    </div>
-  </div>
-</div>
+<footer>
+  Avatar Learning Center &nbsp;&#9670;&nbsp; <a href="https://github.com/avatarmath-llc/curriculum-planning-tool" target="_blank">GitHub</a>
+</footer>
 
-<!-- MODAL: Confirm -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal">
-    <h2>Confirm Delete</h2>
-    <p id="confirm-msg" style="font-size:12px;color:var(--muted);line-height:1.6"></p>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('confirm-modal')">Cancel</button>
-      <button class="btn btn-r" id="confirm-ok">Delete</button>
-    </div>
-  </div>
-</div>
-
-<script>
-document.getElementById('yr').textContent = new Date().getFullYear();
-
-/* ══ THEME ══ */
-function setTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('btn-dark').classList.toggle('active',t==='dark');
-  document.getElementById('btn-light').classList.toggle('active',t==='light');
-  try{localStorage.setItem('alc_theme',t);}catch(e){}
-}
-(function(){try{const t=localStorage.getItem('alc_theme');if(t)setTheme(t);}catch(e){}})();
-
-/* ══ DATA ══ */
-const I='I',C='C',M='M',R='R',_=null;
-const BRAND_COLORS=['#2E68A1','#5AACCF','#1a4171','#f53a33','#81c171','#ec90b7','#8bccc8','#b587b8','#fddd54','#ff9130','#ca4c95','#904171','#3a9e8a','#b56a00','#1a7a70'];
-const GRADE_LABELS=['K','1','2','3','4','5','6','7','8','9','10','11','12'];
-
-const DEFAULT_DOMAINS=[
-  {name:'Counting & Cardinality',color:'#f53a33',topics:[
-    {name:'Counting to 100',sub:'sequence, one-to-one correspondence',g:[C,M,R,_,_,_,_,_,_,_,_,_,_]},
-    {name:'Comparing quantities',sub:'more, fewer, equal',g:[I,C,M,_,_,_,_,_,_,_,_,_,_]},
-    {name:'Number names & writing',sub:'0-20 then extended',g:[C,M,R,_,_,_,_,_,_,_,_,_,_]},
-  ]},
-  {name:'Operations & Algebraic Thinking',color:'#ff9130',topics:[
-    {name:'Addition & subtraction concepts',sub:'join, separate, compare',g:[I,C,M,R,_,_,_,_,_,_,_,_,_]},
-    {name:'Basic fact fluency',sub:'add/sub within 10-20; mult/div 100',g:[_,I,C,C,M,R,_,_,_,_,_,_,_]},
-    {name:'Multiplication & division concepts',sub:'equal groups, arrays',g:[_,_,_,I,C,M,R,_,_,_,_,_,_]},
-    {name:'Patterns & sequences',sub:'arithmetic, growing patterns',g:[I,C,C,C,C,C,_,_,_,_,_,_,_]},
-    {name:'Properties of operations',sub:'commutative, associative, distributive',g:[_,I,C,C,M,R,R,_,_,_,_,_,_]},
-  ]},
-  {name:'Number & Operations in Base Ten',color:'#2E68A1',topics:[
-    {name:'Place value',sub:'tens/ones to thousands to millions',g:[I,C,C,C,C,M,R,_,_,_,_,_,_]},
-    {name:'Multi-digit addition & subtraction',sub:'standard algorithm',g:[_,I,C,C,M,R,_,_,_,_,_,_,_]},
-    {name:'Multi-digit multiplication',sub:'4-digit x 1-digit, 2x2',g:[_,_,_,I,C,M,R,_,_,_,_,_,_]},
-    {name:'Multi-digit division',sub:'long division, remainders',g:[_,_,_,I,C,M,R,_,_,_,_,_,_]},
-    {name:'Decimals',sub:'tenths, hundredths; operations',g:[_,_,_,_,I,C,M,R,_,_,_,_,_]},
-  ]},
-  {name:'Number & Operations - Fractions',color:'#ca4c95',topics:[
-    {name:'Fraction concepts',sub:'equal parts, unit fractions, number line',g:[_,_,I,C,C,C,R,_,_,_,_,_,_]},
-    {name:'Equivalent fractions',sub:'simplifying, comparing',g:[_,_,_,I,C,M,R,_,_,_,_,_,_]},
-    {name:'Add & subtract fractions',sub:'like to unlike denominators',g:[_,_,_,I,C,C,M,R,_,_,_,_,_]},
-    {name:'Multiply & divide fractions',sub:'fraction x whole, fraction / whole',g:[_,_,_,_,I,C,M,R,_,_,_,_,_]},
-    {name:'Fractions as division / mixed numbers',sub:'',g:[_,_,_,_,C,C,M,R,_,_,_,_,_]},
-  ]},
-  {name:'Ratios, Proportional Relationships & Percents',color:'#904171',topics:[
-    {name:'Ratio concepts',sub:'part-to-part, part-to-whole',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Unit rates & proportional reasoning',sub:'',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Percents',sub:'percent of a number, percent change',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Proportional relationships',sub:'tables, graphs, equations',g:[_,_,_,_,_,_,_,I,C,R,_,_,_]},
-  ]},
-  {name:'The Number System',color:'#1a7a70',topics:[
-    {name:'Negative numbers & integers',sub:'number line, absolute value',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Rational numbers',sub:'all fractions & decimals; operations',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Irrational numbers & real number system',sub:'sqrt(2), pi, etc.',g:[_,_,_,_,_,_,_,_,I,C,M,R,_]},
-  ]},
-  {name:'Expressions, Equations & Inequalities',color:'#b56a00',topics:[
-    {name:'Variables & algebraic expressions',sub:'writing, evaluating',g:[_,_,_,_,_,I,C,M,R,R,_,_,_]},
-    {name:'One-variable equations',sub:'1-step to 2-step to multi-step',g:[_,_,_,_,_,I,C,C,M,R,_,_,_]},
-    {name:'Inequalities',sub:'solving & graphing on number line',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Systems of equations',sub:'substitution, elimination',g:[_,_,_,_,_,_,_,_,I,C,M,R,_]},
-    {name:'Quadratic equations',sub:'factoring, completing square, formula',g:[_,_,_,_,_,_,_,_,_,I,C,M,R]},
-    {name:'Polynomial & rational expressions',sub:'',g:[_,_,_,_,_,_,_,_,_,I,C,M,M]},
-    {name:'Exponential expressions',sub:'integer exponents, scientific notation',g:[_,_,_,_,_,_,_,_,I,C,C,M,R]},
-    {name:'Radical expressions',sub:'simplifying, operations',g:[_,_,_,_,_,_,_,_,I,C,C,M,R]},
-  ]},
-  {name:'Functions',color:'#1a4171',topics:[
-    {name:'Function concept',sub:'input/output, domain, range',g:[_,_,_,_,_,_,_,_,I,C,M,R,R]},
-    {name:'Linear functions',sub:'slope, intercepts, slope-intercept form',g:[_,_,_,_,_,_,_,I,C,C,M,R,_]},
-    {name:'Quadratic functions',sub:'vertex, axis of symmetry, parabola',g:[_,_,_,_,_,_,_,_,_,I,C,M,R]},
-    {name:'Exponential functions',sub:'growth & decay models',g:[_,_,_,_,_,_,_,_,_,I,C,M,R]},
-    {name:'Absolute value & piecewise functions',sub:'',g:[_,_,_,_,_,_,_,_,_,I,C,M,R]},
-    {name:'Logarithmic functions',sub:'log laws, natural log',g:[_,_,_,_,_,_,_,_,_,_,I,C,M]},
-    {name:'Trigonometric functions',sub:'unit circle, identities, graphs',g:[_,_,_,_,_,_,_,_,_,_,I,C,M]},
-  ]},
-  {name:'Geometry',color:'#2E68A1',topics:[
-    {name:'Shapes: identify & describe',sub:'2-D and 3-D',g:[C,C,C,C,M,R,_,_,_,_,_,_,_]},
-    {name:'Symmetry & congruence',sub:'lines of symmetry, basic congruence',g:[_,_,I,C,M,R,_,_,_,_,_,_,_]},
-    {name:'Perimeter & area',sub:'rectangles to composite figures',g:[_,_,I,C,C,M,R,_,_,_,_,_,_]},
-    {name:'Volume',sub:'rectangular prisms to 3-D solids',g:[_,_,_,_,I,C,C,M,R,_,_,_,_]},
-    {name:'Coordinate plane',sub:'1 quadrant to 4 quadrants',g:[_,_,_,_,I,C,C,C,M,R,_,_,_]},
-    {name:'Angles',sub:'measuring, types, angle relationships',g:[_,_,_,I,C,C,M,R,_,_,_,_,_]},
-    {name:'Transformations',sub:'translations, reflections, rotations, dilations',g:[_,_,_,_,_,_,_,I,C,M,R,R,_]},
-    {name:'Similarity & scale',sub:'similar figures, scale factor',g:[_,_,_,_,_,_,_,I,C,M,R,_,_]},
-    {name:'Pythagorean Theorem',sub:'proof, application, distance formula',g:[_,_,_,_,_,_,_,_,I,C,M,R,_]},
-    {name:'Congruence & proof',sub:'geometric proofs, CPCTC',g:[_,_,_,_,_,_,_,_,_,I,C,M,R]},
-    {name:'Circles',sub:'circumference, area, arc length, sectors',g:[_,_,_,_,_,I,C,R,_,I,C,M,R]},
-    {name:'Surface area',sub:'nets to formulas',g:[_,_,_,_,_,_,I,C,M,R,_,_,_]},
-    {name:'Analytic geometry',sub:'distance, midpoint, lines/circles',g:[_,_,_,_,_,_,_,_,_,I,C,M,R]},
-  ]},
-  {name:'Measurement & Data / Statistics',color:'#3a9e8a',topics:[
-    {name:'Measurement (length, weight, time)',sub:'nonstandard to standard',g:[I,C,C,C,M,R,_,_,_,_,_,_,_]},
-    {name:'Telling time & money',sub:'',g:[I,C,C,M,R,_,_,_,_,_,_,_,_]},
-    {name:'Graphs & data display',sub:'bar, line, pie, scatter plots',g:[I,C,C,C,C,C,C,C,M,R,R,_,_]},
-    {name:'Unit conversion',sub:'within and between systems',g:[_,_,_,I,C,C,M,R,_,_,_,_,_]},
-    {name:'Descriptive statistics',sub:'mean, median, mode, range, IQR',g:[_,_,_,_,_,_,I,C,M,R,R,_,_]},
-    {name:'Distribution & spread',sub:'box plots, dot plots, std. deviation',g:[_,_,_,_,_,_,_,I,C,C,M,R,_]},
-    {name:'Probability',sub:'experimental, theoretical, compound events',g:[_,_,_,_,_,_,I,C,C,M,R,_,_]},
-    {name:'Two-variable data',sub:'scatter plots, correlation, regression',g:[_,_,_,_,_,_,_,_,I,C,M,R,_]},
-  ]},
-  {name:'Advanced / High School Topics',color:'#b587b8',topics:[
-    {name:'Matrices & matrix operations',sub:'solving systems',g:[_,_,_,_,_,_,_,_,_,_,I,C,M]},
-    {name:'Complex numbers',sub:'imaginary unit, operations',g:[_,_,_,_,_,_,_,_,_,_,I,C,M]},
-    {name:'Sequences & series',sub:'arithmetic, geometric, sigma notation',g:[_,_,_,_,_,_,_,_,_,I,C,M,M]},
-    {name:'Combinatorics & probability',sub:'permutations, combinations',g:[_,_,_,_,_,_,_,_,_,I,C,M,M]},
-    {name:'Limits & intro to calculus',sub:'informal limits, derivatives',g:[_,_,_,_,_,_,_,_,_,_,_,I,C]},
-  ]},
-];
-
-const cloneDeep=o=>JSON.parse(JSON.stringify(o));
-
-/* ══ STATE ══ */
-let domains=[],cells={};
-// Filter state
-let selGrades=new Set(); // selected grade indices
-let selDomains=new Set(); // selected domain indices (empty = all)
-let viewMode='all'; // 'all'|'only'
-let neighborMode=false;
-
-function defaultCells(doms){
-  const s={};
-  doms.forEach((d,di)=>d.topics.forEach((t,ti)=>t.g.forEach((v,gi)=>{s[`${di}-${ti}-${gi}`]=v;})));
-  return s;
-}
-
-/* ══ GITHUB SYNC ══ */
-const GH_OWNER='avatarmath-llc',GH_REPO='curriculum-planning-tool',GH_FILE='data.json';
-const GH_RAW=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
-const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
-let ghSyncTimer=null;
-
-function getToken(){try{return localStorage.getItem('gh_token')||'';}catch(e){return '';}}
-
-function openGhModal(){
-  document.getElementById('gh-token-input').value=getToken();
-  document.getElementById('gh-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('gh-token-input').focus(),60);
-}
-function saveGhToken(){
-  const t=document.getElementById('gh-token-input').value.trim();
-  if(!t){document.getElementById('gh-token-input').focus();return;}
-  try{localStorage.setItem('gh_token',t);}catch(e){}
-  closeModal('gh-modal');
-  updateGhStatus('connected');
-  toast('GitHub connected — changes will sync automatically');
-}
-function clearGhToken(){
-  try{localStorage.removeItem('gh_token');}catch(e){}
-  closeModal('gh-modal');
-  updateGhStatus('');
-  toast('GitHub disconnected');
-}
-function updateGhStatus(state){
-  const btn=document.getElementById('gh-btn');
-  const lbl=document.getElementById('gh-status');
-  if(!btn||!lbl)return;
-  if(state==='connected'){btn.style.color='var(--btn-g-c)';btn.style.borderColor='var(--btn-g-bd)';lbl.textContent='✓ synced';lbl.style.color='var(--btn-g-c)';}
-  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='var(--muted)';}
-  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='var(--btn-g-c)';}
-  else if(state==='error'){lbl.textContent='✕ sync failed — check token';lbl.style.color='var(--btn-r-c)';}
-  else{btn.style.color='';btn.style.borderColor='';lbl.textContent=getToken()?'✓ synced':'';}
-}
-async function syncToGitHub(){
-  const token=getToken();
-  if(!token)return;
-  updateGhStatus('saving');
-  try{
-    let sha=null;
-    const r=await fetch(GH_API,{headers:{Authorization:`token ${token}`,Accept:'application/vnd.github+json'}});
-    if(r.ok){sha=(await r.json()).sha;}
-    const content=JSON.stringify({domains,cells},null,2);
-    const encoded=btoa(unescape(encodeURIComponent(content)));
-    const body={message:'Update curriculum data',content:encoded};
-    if(sha)body.sha=sha;
-    const res=await fetch(GH_API,{method:'PUT',headers:{Authorization:`token ${token}`,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
-    if(res.ok){updateGhStatus('saved');setTimeout(()=>updateGhStatus('connected'),2500);}
-    else{updateGhStatus('error');}
-  }catch(e){updateGhStatus('error');}
-}
-
-/* ══ SAVE ══ */
-function save(){
-  try{localStorage.setItem('alc_k12_v4',JSON.stringify({domains,cells}));}catch(e){}
-  clearTimeout(ghSyncTimer);
-  ghSyncTimer=setTimeout(syncToGitHub,600);
-}
-
-/* ══ FILTER BAR INIT ══ */
-function buildFilterBar(){
-  // Grade pills
-  const gp=document.getElementById('grade-pills');
-  gp.innerHTML=GRADE_LABELS.map((l,i)=>`<button class="grade-pill" data-gi="${i}" onclick="toggleGrade(${i})">${l}</button>`).join('');
-  // Domain chips — rebuilt after each domain change
-  rebuildDomainChips();
-}
-
-function rebuildDomainChips(){
-  const dc=document.getElementById('domain-chips');
-  dc.innerHTML=domains.map((d,i)=>
-    `<div class="domain-chip${selDomains.has(i)?' selected':''}" data-di="${i}" onclick="toggleDomain(${i})" style="${selDomains.has(i)?'':'border-left:3px solid '+d.color}">${esc(d.name)}</div>`
-  ).join('');
-}
-
-function toggleGrade(gi){
-  if(selGrades.has(gi)){selGrades.delete(gi);}else{selGrades.add(gi);}
-  applyFilters();
-}
-
-function toggleDomain(di){
-  if(selDomains.has(di)){selDomains.delete(di);}else{selDomains.add(di);}
-  rebuildDomainChips();
-  applyFilters();
-}
-
-function setView(v){
-  viewMode=v;
-  ['all','only'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x===v));
-  applyFilters();
-}
-
-function clearAllFilters(){
-  selGrades.clear();selDomains.clear();rebuildDomainChips();
-  viewMode='all';
-  document.getElementById('search-input').value='';
-  neighborMode=false;
-  ['all','only'].forEach(x=>document.getElementById('vb-'+x).classList.toggle('active',x==='all'));
-  applyFilters();
-}
-
-/* ══ APPLY FILTERS ══ */
-function applyFilters(){
-  const q=document.getElementById('search-input').value.trim().toLowerCase();
-
-  // Build effective grade set (with neighbors)
-  const effGrades=new Set(selGrades);
-  if(neighborMode && selGrades.size>0){
-    selGrades.forEach(gi=>{
-      if(gi>0)effGrades.add(gi-1);
-      if(gi<12)effGrades.add(gi+1);
-    });
-  }
-
-  // Update grade pill classes
-  document.querySelectorAll('.grade-pill').forEach(p=>{
-    const gi=parseInt(p.dataset.gi);
-    p.classList.toggle('selected',selGrades.has(gi));
-    p.classList.toggle('neighbor',!selGrades.has(gi)&&effGrades.has(gi));
-  });
-
-  // Update column header classes
-  document.querySelectorAll('thead th[data-gi]').forEach(th=>{
-    const gi=parseInt(th.dataset.gi);
-    const inRange=selGrades.size===0||effGrades.has(gi);
-    const isSelected=selGrades.has(gi);
-    const isNeighbor=effGrades.has(gi)&&!isSelected;
-    th.classList.toggle('col-active',inRange&&selGrades.size>0);
-    th.classList.toggle('col-dimmed',!inRange&&selGrades.size>0);
-    if(selGrades.size===0)th.classList.remove('col-hidden');
-  });
-
-  // Per-row filtering
-  let visibleTopics=0,totalTopics=0;
-  domains.forEach((domain,di)=>{
-    const domainMatch=selDomains.size===0||selDomains.has(di);
-    let anyVisible=false;
-    domain.topics.forEach((topic,ti)=>{
-      totalTopics++;
-      const nameMatch=q===''||(topic.name+' '+(topic.sub||'')).toLowerCase().includes(q);
-      // Does this topic have a dot in the effective grade range?
-      const hasInRange=selGrades.size===0||[...effGrades].some(gi=>cells[`${di}-${ti}-${gi}`]);
-      const show=domainMatch&&nameMatch&&(selGrades.size===0||hasInRange);
-      const tr=document.querySelector(`tr.topic-row[data-di="${di}"][data-ti="${ti}"]`);
-      if(!tr)return;
-      const searchFail = q!=='' && !nameMatch;
-      const domainFail = selDomains.size>0 && !domainMatch;
-      const gradeFail = selGrades.size>0 && !hasInRange;
-      const hideRow = searchFail || domainFail || (viewMode==='only' && gradeFail);
-      tr.classList.toggle('row-hidden', hideRow);
-      tr.classList.remove('row-dimmed');
-      // Highlight search term
-      const nameEl=tr.querySelector('.t-name-text');
-      if(nameEl){
-        if(q&&nameMatch){
-          nameEl.innerHTML=esc(topic.name).replace(new RegExp(escReg(q),'gi'),m=>`<span class="search-hl">${m}</span>`);
-        }else{
-          nameEl.textContent=topic.name;
-        }
-      }
-      if(!hideRow){visibleTopics++;anyVisible=true;}
-    });
-    // Hide domain header when all its topics are hidden
-    const drow=document.querySelector(`tr.domain-row[data-di="${di}"]`);
-    if(drow){
-      const allHidden = domain.topics.every((_,ti2)=>{
-        const tr2=document.querySelector(`tr.topic-row[data-di="${di}"][data-ti="${ti2}"]`);
-        return tr2 && tr2.classList.contains('row-hidden');
-      });
-      drow.classList.toggle('domain-hidden', allHidden && (selDomains.size>0||selGrades.size>0||q!==''));
-    }
-  });
-
-  // Update column cell classes
-  document.querySelectorAll('td.drop-cell').forEach(td=>{
-    const gi=parseInt(td.dataset.gi);
-    const inRange=selGrades.size===0||effGrades.has(gi);
-    td.classList.toggle('col-active',inRange&&selGrades.size>0);
-    td.classList.toggle('col-dimmed',!inRange&&selGrades.size>0);
-    if(selGrades.size===0)td.classList.remove('col-hidden');
-  });
-
-  // Count
-  const cEl=document.getElementById('filter-count');
-  const hasFilter=selGrades.size>0||selDomains.size>0||q;
-  cEl.textContent=hasFilter?`${visibleTopics} / ${totalTopics} topics`:'';
-  updateGradeIndicator();
-
-  // Update print subtitle
-  updatePrintSubtitle(effGrades,q);
-}
-
-function escReg(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
-
-function updatePrintSubtitle(effGrades,q){
-  let parts=[];
-  if(selGrades.size>0){
-    const gl=[...effGrades].sort((a,b)=>a-b).map(i=>GRADE_LABELS[i]);
-    parts.push('Grades: '+gl.join(', '));
-  }
-  if(selDomains.size>0){
-    parts.push('Domains: '+[...selDomains].map(i=>domains[i]?.name).join(', '));
-  }
-  if(q)parts.push('Search: "'+q+'"');
-  document.getElementById('print-subtitle').textContent=
-    parts.length?parts.join(' \u00b7 '):'avatarlc.com \u00b7 All grades & domains';
-}
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape')hideCellPicker();});
-
-/* ══ CELL PICKER ══ */
-let pickerKey=null,pickerTd=null;
-function showCellPicker(td,key,e){
-  pickerKey=key;pickerTd=td;
-  const pk=document.getElementById('cell-picker');
-  const cur=cells[key];
-  pk.querySelectorAll('.pal-dot').forEach(d=>d.classList.toggle('selected',d.dataset.type===cur));
-  pk.classList.add('open');
-  const rect=td.getBoundingClientRect();
-  const pw=168,ph=40;
-  let left=rect.left+rect.width/2-pw/2;
-  let top=rect.bottom+6;
-  if(left<4)left=4;
-  if(left+pw>window.innerWidth-4)left=window.innerWidth-4-pw;
-  if(top+ph>window.innerHeight-4)top=rect.top-ph-6;
-  pk.style.left=left+'px';pk.style.top=top+'px';
-  e.stopPropagation();
-}
-function pickCellType(type){
-  if(!pickerKey)return;
-  const v=type==='X'?null:type;
-  cells[pickerKey]=v;save();renderCell(pickerTd,v);toast(v?LABEL[v]:'Removed');
-  hideCellPicker();
-}
-function hideCellPicker(){
-  document.getElementById('cell-picker').classList.remove('open');
-  pickerKey=null;pickerTd=null;
-}
-document.addEventListener('click',hideCellPicker);
-document.getElementById('cell-picker').addEventListener('click',e=>e.stopPropagation());
-
-/* ══ TABLE ══ */
-const LABEL={I:'Introduced',C:'Core focus',M:'Mastery',R:'Review / extend'};
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function buildTable(){
-  const tbody=document.getElementById('tbody');
-  tbody.innerHTML='';
-  domains.forEach((domain,di)=>{
-    const drow=document.createElement('tr');
-    drow.className='domain-row';
-    drow.dataset.di=di;
-    const dtd=document.createElement('td');
-    dtd.colSpan=14;
-    dtd.style.cssText=`background:${domain.color};border-bottom-color:${domain.color}`;
-    dtd.innerHTML=`${esc(domain.name)}<span class="domain-acts">
-      <button class="icon-btn" title="Edit domain" onclick="openEditDomain(${di})">&#9998;</button>
-      <button class="icon-btn" title="Add topic here" onclick="openAddTopicTo(${di})">+</button>
-      <button class="icon-btn" title="Delete domain" onclick="confirmDel('domain',${di},-1)">&#10005;</button>
-    </span>`;
-    drow.appendChild(dtd);
-    tbody.appendChild(drow);
-
-    domain.topics.forEach((topic,ti)=>{
-      const tr=document.createElement('tr');
-      tr.className='topic-row';
-      tr.dataset.di=di; tr.dataset.ti=ti;
-      const ntd=document.createElement('td');
-      ntd.innerHTML=`<span class="t-name"><span class="t-name-text">${esc(topic.name)}</span><span class="topic-acts">
-        <button class="icon-btn" style="background:rgba(90,172,207,.2);color:var(--primary-lt)" title="Edit topic" onclick="openEditTopic(${di},${ti})">&#9998;</button>
-        <button class="icon-btn" style="background:rgba(245,58,51,.2);color:#f53a33" title="Delete topic" onclick="confirmDel('topic',${di},${ti})">&#10005;</button>
-      </span></span>${topic.sub?`<span class="t-sub">${esc(topic.sub)}</span>`:''}`;
-      tr.appendChild(ntd);
-      for(let gi=0;gi<13;gi++){
-        const key=`${di}-${ti}-${gi}`;
-        const td=document.createElement('td');
-        td.className='drop-cell'+([0,3,6,9].includes(gi)?' band':'');
-        td.dataset.key=key; td.dataset.gi=gi;
-        renderCell(td,cells[key]);
-        td.addEventListener('click',e=>{
-          if(td.classList.contains('col-dimmed'))return;
-          showCellPicker(td,key,e);
-        });
-        tr.appendChild(td);
-      }
-      tbody.appendChild(tr);
-    });
-  });
-  rebuildDomainChips();
-  applyFilters();
-}
-
-function renderCell(td,val){
-  td.innerHTML='';
-  if(!val)return;
-  const dot=document.createElement('div');
-  dot.className='cell-dot';dot.dataset.type=val;
-  dot.title=LABEL[val]+' \u2014 click to remove';
-  dot.textContent=val==='C'?'\u25CF':val;
-  td.appendChild(dot);
-}
-
-/* ══ PRINT ══ */
-function printView(){
-  window.print();
-}
-
-/* ══ MODALS SHARED ══ */
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-['export-modal','confirm-modal','topic-modal','domain-modal','gh-modal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);});
-});
-
-/* ══ ADD / EDIT TOPIC ══ */
-let editTopic=null;
-function populateDomainSel(di){
-  document.getElementById('tm-domain').innerHTML=domains.map((d,i)=>`<option value="${i}"${i===di?' selected':''}>${esc(d.name)}</option>`).join('');
-}
-function openAddTopic(){openAddTopicTo(0);}
-function openAddTopicTo(di){
-  editTopic=null;
-  document.getElementById('tm-title').textContent='Add Topic';
-  document.getElementById('tm-save').textContent='Add Topic';
-  populateDomainSel(di);
-  document.getElementById('tm-name').value='';
-  document.getElementById('tm-sub').value='';
-  document.getElementById('topic-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('tm-name').focus(),60);
-}
-function openEditTopic(di,ti){
-  editTopic={di,ti};
-  const t=domains[di].topics[ti];
-  document.getElementById('tm-title').textContent='Edit Topic';
-  document.getElementById('tm-save').textContent='Save Changes';
-  populateDomainSel(di);
-  document.getElementById('tm-name').value=t.name;
-  document.getElementById('tm-sub').value=t.sub||'';
-  document.getElementById('topic-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('tm-name').focus(),60);
-}
-function saveTopic(){
-  const name=document.getElementById('tm-name').value.trim();
-  if(!name){document.getElementById('tm-name').focus();return;}
-  const sub=document.getElementById('tm-sub').value.trim();
-  const di=parseInt(document.getElementById('tm-domain').value);
-  if(editTopic){
-    const{di:odi,ti}=editTopic;
-    if(odi!==di){
-      const newTi=domains[di].topics.length;
-      for(let gi=0;gi<13;gi++){cells[`${di}-${newTi}-${gi}`]=cells[`${odi}-${ti}-${gi}`]??null;delete cells[`${odi}-${ti}-${gi}`];}
-      domains[odi].topics.splice(ti,1);
-      domains[di].topics.push({name,sub,g:Array(13).fill(null)});
-      rebuildKeys();
-    }else{
-      domains[odi].topics[ti].name=name;
-      domains[odi].topics[ti].sub=sub;
-    }
-  }else{
-    const newTi=domains[di].topics.length;
-    domains[di].topics.push({name,sub,g:Array(13).fill(null)});
-    for(let gi=0;gi<13;gi++)cells[`${di}-${newTi}-${gi}`]=null;
-  }
-  save();buildTable();closeModal('topic-modal');
-  toast(editTopic?'Topic updated':'Topic added');
-}
-
-/* ══ ADD / EDIT DOMAIN ══ */
-let editDomain=null,pickedColor=BRAND_COLORS[0];
-function buildSwatches(cur){
-  pickedColor=cur||BRAND_COLORS[0];
-  document.getElementById('dm-swatches').innerHTML=BRAND_COLORS.map(c=>
-    `<div class="swatch${c===pickedColor?' selected':''}" style="background:${c}" data-color="${c}" onclick="pickColor('${c}')"></div>`).join('');
-}
-function pickColor(c){pickedColor=c;document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('selected',s.dataset.color===c));}
-function openAddDomain(){
-  editDomain=null;
-  document.getElementById('dm-title').textContent='Add Domain';
-  document.getElementById('dm-save').textContent='Add Domain';
-  document.getElementById('dm-name').value='';
-  buildSwatches(BRAND_COLORS[0]);
-  document.getElementById('domain-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('dm-name').focus(),60);
-}
-function openEditDomain(di){
-  editDomain=di;
-  document.getElementById('dm-title').textContent='Edit Domain';
-  document.getElementById('dm-save').textContent='Save Changes';
-  document.getElementById('dm-name').value=domains[di].name;
-  buildSwatches(domains[di].color);
-  document.getElementById('domain-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('dm-name').focus(),60);
-}
-function saveDomain(){
-  const name=document.getElementById('dm-name').value.trim();
-  if(!name){document.getElementById('dm-name').focus();return;}
-  if(editDomain!==null){domains[editDomain].name=name;domains[editDomain].color=pickedColor;}
-  else{domains.push({name,color:pickedColor,topics:[]});}
-  save();buildTable();closeModal('domain-modal');
-  toast(editDomain!==null?'Domain updated':'Domain added');
-}
-
-/* ══ DELETE ══ */
-let pendingDel=null;
-function confirmDel(type,di,ti){
-  pendingDel={type,di,ti};
-  document.getElementById('confirm-msg').textContent=type==='domain'
-    ?`Delete domain "${domains[di].name}" and all its ${domains[di].topics.length} topic(s)? Cannot be undone.`
-    :`Delete topic "${domains[di].topics[ti].name}"? Cannot be undone.`;
-  document.getElementById('confirm-ok').onclick=executeDel;
-  document.getElementById('confirm-modal').classList.add('open');
-}
-function executeDel(){
-  if(!pendingDel)return;
-  const{type,di,ti}=pendingDel;
-  if(type==='domain'){
-    domains[di].topics.forEach((_,ti2)=>{for(let gi=0;gi<13;gi++)delete cells[`${di}-${ti2}-${gi}`];});
-    domains.splice(di,1);rebuildKeys();
-  }else{
-    for(let gi=0;gi<13;gi++)delete cells[`${di}-${ti}-${gi}`];
-    domains[di].topics.splice(ti,1);rebuildKeys();
-  }
-  save();buildTable();closeModal('confirm-modal');toast('Deleted');
-}
-function rebuildKeys(){
-  const n={};
-  domains.forEach((d,di)=>d.topics.forEach((t,ti)=>{
-    for(let gi=0;gi<13;gi++){const k=`${di}-${ti}-${gi}`;n[k]=cells[k]!==undefined?cells[k]:null;}
-  }));
-  cells=n;
-}
-
-/* ══ RESET / EXPORT ══ */
-function resetToDefault(){
-  if(!confirm('Reset to CCSS defaults? All changes will be lost.'))return;
-  domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);
-  save();buildTable();clearAllFilters();toast('Reset to CCSS defaults');
-}
-function openExport(){
-  const out={};
-  domains.forEach((d,di)=>{
-    out[d.name]={};
-    d.topics.forEach((t,ti)=>{
-      const grades={};
-      for(let gi=0;gi<13;gi++){const v=cells[`${di}-${ti}-${gi}`];if(v)grades[gi===0?'K':String(gi)]=v;}
-      if(Object.keys(grades).length)out[d.name][t.name]=grades;
-    });
-  });
-  document.getElementById('export-text').value=JSON.stringify(out,null,2);
-  document.getElementById('export-modal').classList.add('open');
-}
-function copyExport(){
-  const ta=document.getElementById('export-text');ta.select();document.execCommand('copy');toast('Copied!');
-}
-
-/* ══ GRADE INDICATOR ══ */
-function toggleGradeIndicator(){
-  if(selGrades.size===0)return;
-  // Toggle: if currently in col-hidden mode, go back to showing all; if showing all, hide non-selected
-  const anyHidden=document.querySelector('th.col-hidden');
-  if(anyHidden){
-    // Un-hide — clear col-hidden (but keep selection)
-    document.querySelectorAll('.col-hidden').forEach(el=>el.classList.remove('col-hidden'));
-    document.getElementById('sel-grades-indicator').classList.remove('active');
-  }else{
-    const effG=new Set(selGrades);
-    if(document.getElementById('nbr-chk').checked){
-      selGrades.forEach(gi=>{if(gi>0)effG.add(gi-1);if(gi<12)effG.add(gi+1);});
-    }
-    document.querySelectorAll('thead th[data-gi],td.drop-cell').forEach(el=>{
-      el.classList.toggle('col-hidden',!effG.has(parseInt(el.dataset.gi)));
-    });
-    document.getElementById('sel-grades-indicator').classList.add('active');
-  }
-}
-
-function updateGradeIndicator(){
-  const el=document.getElementById('sel-grades-label');
-  const ind=document.getElementById('sel-grades-indicator');
-  if(!el||!ind)return;
-  if(selGrades.size===0){
-    el.textContent='No grades selected';
-    ind.style.cursor='default';
-    ind.title='Select grade pills above to filter columns';
-    ind.classList.remove('active');
-  }else{
-    const labels=[...selGrades].sort((a,b)=>a-b).map(i=>GRADE_LABELS[i]);
-    el.textContent='Gr '+labels.join(', ')+' — click to toggle columns';
-    ind.style.cursor='pointer';
-    ind.title='Click to show/hide only selected grade columns';
-  }
-}
-
-/* ══ TOAST ══ */
-let toastTimer;
-function toast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1600);
-}
-
-/* ══ INIT ══ */
-async function init(){
-  // Load local state immediately for instant display
-  try{
-    const s=localStorage.getItem('alc_k12_v4');
-    if(s){const p=JSON.parse(s);domains=p.domains;cells=p.cells;}
-    else{domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
-  }catch(e){domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
-  buildFilterBar();buildTable();
-  if(getToken())updateGhStatus('connected');
-
-  // Fetch latest shared state from GitHub in background
-  try{
-    const r=await fetch(GH_RAW+'?t='+Date.now());
-    if(r.ok){
-      const data=await r.json();
-      if(data&&data.domains&&data.cells){
-        const localStr=JSON.stringify({domains,cells});
-        const ghStr=JSON.stringify(data);
-        if(localStr!==ghStr){
-          domains=data.domains;cells=data.cells;
-          try{localStorage.setItem('alc_k12_v4',JSON.stringify({domains,cells}));}catch(e){}
-          buildTable();
-          toast('↻ Synced latest changes from team');
-        }
-      }
-    }
-  }catch(e){}
-}
-init();
-</script>
 </body>
 </html>

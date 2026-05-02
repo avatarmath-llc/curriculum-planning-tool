@@ -104,8 +104,8 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 
 /* ══ FILTER BAR ══ */
 .filter-bar{background:var(--filter-bg);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;flex-direction:column;gap:8px;transition:background .25s;}
-.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.filter-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;min-width:52px;}
+.filter-row{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+.filter-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;min-width:52px;padding-top:4px;}
 
 /* Grade pills */
 .grade-pills{display:flex;gap:4px;flex-wrap:wrap;}
@@ -116,7 +116,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 
 
 /* Domain chips */
-.domain-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.domain-chips{display:flex;gap:5px;flex-wrap:wrap;flex:1;}
 .domain-chip{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--domain-chip-bg);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;}
 .domain-chip:hover{color:var(--ink);}
 .domain-chip.selected{background:var(--domain-chip-sel);color:white;border-color:var(--domain-chip-sel);}

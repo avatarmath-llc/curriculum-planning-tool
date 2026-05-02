@@ -66,9 +66,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 /* Ruler */
 .ruler-row{display:grid;grid-template-columns:var(--label-w) 1fr;margin-bottom:3px;}
 .ruler-inner{position:relative;height:var(--ruler-h);border-left:2px solid var(--primary-lt);overflow:hidden;}
-.ruler-slot{position:absolute;top:0;bottom:0;border-right:1px solid var(--border);}
+.ruler-slot{position:absolute;top:0;bottom:14px;border-right:1px solid var(--border);}
 .ruler-slot.hour{border-right:2px solid var(--primary-lt);}
-.ruler-label{position:absolute;bottom:4px;font-size:9px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;}
+.ruler-label{position:absolute;bottom:2px;font-size:8.5px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;}
+.ruler-label.hour{font-size:9px;color:var(--primary-lt);font-weight:500;}
 
 /* Day row */
 .day-row{display:grid;grid-template-columns:var(--label-w) 1fr;margin-bottom:3px;}
@@ -323,6 +324,7 @@ let ghTimer=null;
 function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function toTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
 function fmt(m){const h=Math.floor(m/60),mn=m%60,ap=h>=12?'PM':'AM',h12=h%12||12;return`${h12}:${String(mn).padStart(2,'0')} ${ap}`;}
+function fmtShort(m){const h=Math.floor(m/60)%12||12,mn=m%60;return`${h}:${String(mn).padStart(2,'0')}`; }
 function slotInfo(){
   const slot=cfg.slotMin||15;
   const s=toMin(cfg.startTime),e=toMin(cfg.endTime),tot=e-s,n=Math.round(tot/slot);
@@ -432,7 +434,7 @@ function renderGrid(){
   for(let i=0;i<=numSlots;i++){
     const m=startMin+i*slot,isHour=m%60===0,pct=(i/numSlots*100).toFixed(3);
     if(i<numSlots)html+=`<div class="ruler-slot${isHour?' hour':''}" style="left:${pct}%;width:${(100/numSlots).toFixed(3)}%"></div>`;
-    if(isHour)html+=`<span class="ruler-label" style="left:${pct}%">${fmt(m)}</span>`;
+    html+=`<span class="ruler-label${isHour?' hour':''}" style="left:${pct}%">${isHour?fmt(m):fmtShort(m)}</span>`;
   }
   html+=`</div></div>`;
 

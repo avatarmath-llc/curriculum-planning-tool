@@ -95,6 +95,14 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 /* Drop indicator */
 .drop-target{position:absolute;top:4px;bottom:4px;background:rgba(46,104,161,.15);border:2px dashed var(--primary);border-radius:5px;pointer-events:none;z-index:1;}
 
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none;background:#fff;border-bottom:2px solid #c2d8ee;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.mobile-nav::-webkit-scrollbar{display:none;}
+.mobile-nav a{display:flex;align-items:center;padding:0 16px;height:44px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6a8aab;text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;transition:color .15s,border-color .15s,background .15s;}
+.mobile-nav a.mnav-home{text-transform:none;letter-spacing:.04em;border-right:1px solid #c2d8ee;}
+.mobile-nav a:hover{background:#e8f0f8;color:#2E68A1;}
+.mobile-nav a.active{color:#2E68A1;border-bottom-color:#2E68A1;font-weight:500;}
+
 /* ── MOBILE ── */
 @media(max-width:600px){
   .brand-bar{padding:8px 12px;gap:10px;}
@@ -102,9 +110,8 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
   .brand-sub{font-size:.55rem;}
   .brand-icon-wrap{width:40px;height:40px;}
   .brand-icon-wrap img{height:73px;margin-top:-7px;margin-left:-13px;}
-  .brand-nav{gap:3px;}
-  .bnav-home{font-size:8.5px;}
-  .bnav-tool{padding:3px 6px;font-size:8px;}
+  .brand-nav{display:none;}
+  .mobile-nav{display:flex;}
   .btn{padding:8px 14px;min-height:40px;}
   .dur-btn{padding:10px 4px;min-height:44px;}
   .schedule-wrap{padding:8px;}
@@ -163,6 +170,14 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
       <a href="lesson-plan.html" class="bnav-tool">Lesson Plan</a>
     </div>
   </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <a href="index.html" class="mnav-home">&#8592; Dashboard</a>
+  <a href="curriculum.html">Curriculum</a>
+  <a href="schedule.html" class="active">Scheduler</a>
+  <a href="lesson-plan.html">Lesson Plan</a>
 </div>
 
 <!-- CONFIG BAR -->

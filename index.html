@@ -22,6 +22,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 .brand-icon-wrap img{height:98px;width:auto;display:block;margin-top:-10px;margin-left:-17px;}
 .brand-nav{margin-left:auto;}
 .brand-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.25);white-space:nowrap;position:absolute;left:0;right:0;pointer-events:none;}
+.mobile-nav{display:none;background:#fff;border-bottom:2px solid #c2d8ee;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.mobile-nav::-webkit-scrollbar{display:none;}
+.mobile-nav a{display:flex;align-items:center;padding:0 16px;height:44px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6a8aab;text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;transition:color .15s,border-color .15s,background .15s;}
+.mobile-nav a:hover{background:#e8f0f8;color:#2E68A1;}
 .brand-sub{display:block;font-size:.62rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.12em;margin-top:4px;text-transform:uppercase;}
 .brand-sep{font-size:.9rem;color:var(--gold);vertical-align:middle;}
 
@@ -86,8 +90,8 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   .brand-sub{font-size:.55rem;}
   .brand-icon-wrap{width:40px;height:40px;}
   .brand-icon-wrap img{height:73px;margin-top:-7px;margin-left:-13px;}
-  .brand-nav{gap:3px;}
-  .bnav-tool{padding:3px 6px;font-size:8px;}
+  .brand-nav{display:none;}
+  .mobile-nav{display:flex;}
   .cards{padding:0 16px 40px;gap:16px;}
   .hero{padding:32px 16px 24px;}
   .hero-title{font-size:1.5rem;}
@@ -116,6 +120,13 @@ footer a{color:var(--primary-lt);text-decoration:none;}
       <a href="lesson-plan.html" class="bnav-tool">Lesson Plan</a>
     </div>
   </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <a href="curriculum.html">Curriculum</a>
+  <a href="schedule.html">Scheduler</a>
+  <a href="lesson-plan.html">Lesson Plan</a>
 </div>
 
 <!-- HERO -->

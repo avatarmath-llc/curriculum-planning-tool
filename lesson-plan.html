@@ -111,15 +111,22 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2c40;color:white;padding:8px 18px;border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;z-index:600;pointer-events:none;white-space:nowrap;}
 #toast.show{opacity:1;}
 
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none;background:#fff;border-bottom:2px solid #c2d8ee;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.mobile-nav::-webkit-scrollbar{display:none;}
+.mobile-nav a{display:flex;align-items:center;padding:0 16px;height:44px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6a8aab;text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;transition:color .15s,border-color .15s,background .15s;}
+.mobile-nav a.mnav-home{text-transform:none;letter-spacing:.04em;border-right:1px solid #c2d8ee;}
+.mobile-nav a:hover{background:#e8f0f8;color:#2E68A1;}
+.mobile-nav a.active{color:#2E68A1;border-bottom-color:#2E68A1;font-weight:500;}
+
 @media(max-width:600px){
   .brand-bar{padding:8px 12px;gap:10px;}
   .brand-title{font-size:.95rem;letter-spacing:.02em;}
   .brand-sub{font-size:.55rem;}
   .brand-icon-wrap{width:40px;height:40px;}
   .brand-icon-wrap img{height:73px;margin-top:-7px;margin-left:-13px;}
-  .brand-nav{gap:3px;}
-  .bnav-home{font-size:8.5px;}
-  .bnav-tool{padding:3px 6px;font-size:8px;}
+  .brand-nav{display:none;}
+  .mobile-nav{display:flex;}
   .toolbar{gap:6px;}
   .btn{min-height:36px;}
   .table-outer{font-size:10px;}
@@ -149,6 +156,14 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
       <a href="lesson-plan.html" class="bnav-tool active">Lesson Plan</a>
     </div>
   </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <a href="index.html" class="mnav-home">&#8592; Dashboard</a>
+  <a href="curriculum.html">Curriculum</a>
+  <a href="schedule.html">Scheduler</a>
+  <a href="lesson-plan.html" class="active">Lesson Plan</a>
 </div>
 
 <!-- TOOLBAR -->

@@ -262,13 +262,20 @@ footer a{color:var(--primary-lt);text-decoration:none;}
 #cell-picker{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:6px 8px;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.28);transition:background .25s;}
 #cell-picker.open{display:flex;}
 
+/* ══ MOBILE NAV ══ */
+.mobile-nav{display:none;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.mobile-nav::-webkit-scrollbar{display:none;}
+.mobile-nav a{display:flex;align-items:center;padding:0 16px;height:44px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:3px solid transparent;transition:color .15s,border-color .15s,background .15s;}
+.mobile-nav a.mnav-home{text-transform:none;letter-spacing:.04em;border-right:1px solid var(--border);}
+.mobile-nav a:hover{background:var(--surface2);color:var(--primary);}
+.mobile-nav a.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:500;}
+
 @media(max-width:600px){
   .brand-bar{padding:8px 12px;gap:10px;}
   .brand-title{font-size:1rem;letter-spacing:.02em;}
   .brand-sub{font-size:.55rem;}
-  .brand-nav{gap:3px;}
-  .bnav-home{font-size:8.5px;}
-  .bnav-tool{padding:3px 6px;font-size:8px;}
+  .brand-nav{display:none;}
+  .mobile-nav{display:flex;}
   .theme-btn{padding:3px 8px;font-size:9px;}
   .toolbar{gap:6px;}
   .btn{min-height:36px;}
@@ -305,6 +312,14 @@ footer a{color:var(--primary-lt);text-decoration:none;}
     <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">&#9790; Dark</button>
     <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">&#9788; Light</button>
   </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <a href="index.html" class="mnav-home">&#8592; Dashboard</a>
+  <a href="curriculum.html" class="active">Curriculum</a>
+  <a href="schedule.html">Scheduler</a>
+  <a href="lesson-plan.html">Lesson Plan</a>
 </div>
 
 <!-- TOOLBAR -->

@@ -60,14 +60,13 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 
 /* ══ BRAND BAR ══ */
 .brand-bar{background:linear-gradient(120deg,#19416f 0%,#2d67a0 55%,#3a7ab8 100%);padding:10px 20px;display:flex;align-items:center;gap:14px;border-bottom:4px solid #c9a83c;flex-wrap:wrap;box-shadow:0 3px 12px rgba(0,0,0,.35);}
-.nav-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.nav-home{font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:.05em;padding:4px 8px;border-radius:5px;transition:all .15s;white-space:nowrap;}
-.nav-home:hover{background:var(--surface2);color:var(--primary);}
-.nav-divider{color:var(--border2);font-size:10px;}
-.nav-tools{display:flex;gap:3px;flex-wrap:wrap;}
-.nav-tool{padding:4px 12px;border-radius:6px;font-size:10px;text-decoration:none;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
-.nav-tool:hover{background:var(--surface2);color:var(--ink);}
-.nav-tool.active{background:var(--primary);color:white;}
+.brand-nav{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.bnav-home{color:rgba(255,255,255,.7);text-decoration:none;font-size:9.5px;letter-spacing:.06em;transition:color .15s;white-space:nowrap;}
+.bnav-home:hover{color:white;}
+.bnav-row{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:flex-end;}
+.bnav-tool{padding:3px 9px;border-radius:5px;font-size:9px;text-decoration:none;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
+.bnav-tool:hover{background:rgba(255,255,255,.15);color:white;}
+.bnav-tool.active{background:rgba(255,255,255,.22);color:white;border:1px solid rgba(255,255,255,.35);}
 .brand-logo{width:40px;height:40px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--primary);flex-shrink:0;letter-spacing:-1px;}
 .brand-name{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:white;line-height:1.15;}
 .brand-name span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-top:1px;}
@@ -262,6 +261,22 @@ footer a{color:var(--primary-lt);text-decoration:none;}
 /* ══ CELL PICKER ══ */
 #cell-picker{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:6px 8px;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.28);transition:background .25s;}
 #cell-picker.open{display:flex;}
+
+@media(max-width:600px){
+  .brand-bar{padding:8px 12px;gap:10px;}
+  .brand-title{font-size:1rem;letter-spacing:.02em;}
+  .brand-sub{font-size:.55rem;}
+  .brand-nav{gap:3px;}
+  .bnav-home{font-size:8.5px;}
+  .bnav-tool{padding:3px 6px;font-size:8px;}
+  .theme-btn{padding:3px 8px;font-size:9px;}
+  .toolbar{gap:6px;}
+  .btn{min-height:36px;}
+}
+@media(max-width:400px){
+  .brand-title{font-size:.85rem;}
+  .brand-sub{display:none;}
+}
 </style>
 </head>
 <body>
@@ -280,20 +295,17 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="brand-spacer"></div>
   <div class="brand-title">Avatar Learning Center &nbsp;<span class="brand-sep">◆</span>&nbsp; Curriculum Planning Tool<span class="brand-sub">K–12 Math Curriculum Map</span></div>
   <div class="brand-spacer"></div>
+  <div class="brand-nav">
+    <a href="index.html" class="bnav-home">&#8592; Dashboard</a>
+    <div class="bnav-row">
+      <a href="curriculum.html" class="bnav-tool active">Curriculum</a>
+      <a href="schedule.html" class="bnav-tool">Scheduler</a>
+      <a href="lesson-plan.html" class="bnav-tool">Lesson Plan</a>
+    </div>
+  </div>
   <div class="theme-toggle" role="group" aria-label="Theme">
     <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">&#9790; Dark</button>
     <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">&#9788; Light</button>
-  </div>
-</div>
-
-<!-- NAV BAR -->
-<div class="nav-bar">
-  <a href="index.html" class="nav-home">&#8592; Dashboard</a>
-  <span class="nav-divider">|</span>
-  <div class="nav-tools">
-    <a href="curriculum.html" class="nav-tool active">Curriculum</a>
-    <a href="schedule.html" class="nav-tool">Scheduler</a>
-    <a href="lesson-plan.html" class="nav-tool">Lesson Plan</a>
   </div>
 </div>
 

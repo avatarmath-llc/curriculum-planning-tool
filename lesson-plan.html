@@ -25,14 +25,13 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 .brand-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);white-space:nowrap;}
 .brand-sub{display:block;font-size:.6rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;}
 .brand-sep{font-size:.85rem;color:#c9a83c;vertical-align:middle;}
-.nav-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:5px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.nav-home{font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:.05em;padding:4px 8px;border-radius:5px;transition:all .15s;white-space:nowrap;}
-.nav-home:hover{background:var(--surface2);color:var(--primary);}
-.nav-divider{color:var(--border2);font-size:10px;}
-.nav-tools{display:flex;gap:3px;flex-wrap:wrap;}
-.nav-tool{padding:4px 12px;border-radius:6px;font-size:10px;text-decoration:none;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
-.nav-tool:hover{background:var(--surface2);color:var(--ink);}
-.nav-tool.active{background:var(--primary);color:white;}
+.brand-nav{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.bnav-home{color:rgba(255,255,255,.7);text-decoration:none;font-size:9.5px;letter-spacing:.06em;transition:color .15s;white-space:nowrap;}
+.bnav-home:hover{color:white;}
+.bnav-row{display:flex;align-items:center;gap:3px;flex-wrap:wrap;justify-content:flex-end;}
+.bnav-tool{padding:3px 9px;border-radius:5px;font-size:9px;text-decoration:none;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
+.bnav-tool:hover{background:rgba(255,255,255,.15);color:white;}
+.bnav-tool.active{background:rgba(255,255,255,.22);color:white;border:1px solid rgba(255,255,255,.35);}
 
 /* ── TOOLBAR ── */
 .toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
@@ -111,6 +110,24 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
 /* ── TOAST ── */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2c40;color:white;padding:8px 18px;border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;z-index:600;pointer-events:none;white-space:nowrap;}
 #toast.show{opacity:1;}
+
+@media(max-width:600px){
+  .brand-bar{padding:8px 12px;gap:10px;}
+  .brand-title{font-size:.95rem;letter-spacing:.02em;}
+  .brand-sub{font-size:.55rem;}
+  .brand-icon-wrap{width:40px;height:40px;}
+  .brand-icon-wrap img{height:73px;margin-top:-7px;margin-left:-13px;}
+  .brand-nav{gap:3px;}
+  .bnav-home{font-size:8.5px;}
+  .bnav-tool{padding:3px 6px;font-size:8px;}
+  .toolbar{gap:6px;}
+  .btn{min-height:36px;}
+  .table-outer{font-size:10px;}
+}
+@media(max-width:400px){
+  .brand-title{font-size:.8rem;}
+  .brand-sub{display:none;}
+}
 </style>
 </head>
 <body>
@@ -125,17 +142,13 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
     Avatar Learning Center &nbsp;<span class="brand-sep">◆</span>&nbsp; Lesson Planner
     <span class="brand-sub">34-Week Pacing Guide</span>
   </div>
-  <div class="brand-spacer"></div>
-</div>
-
-<!-- NAV BAR -->
-<div class="nav-bar">
-  <a href="index.html" class="nav-home">&#8592; Dashboard</a>
-  <span class="nav-divider">|</span>
-  <div class="nav-tools">
-    <a href="curriculum.html" class="nav-tool">Curriculum</a>
-    <a href="schedule.html" class="nav-tool">Scheduler</a>
-    <a href="lesson-plan.html" class="nav-tool active">Lesson Plan</a>
+  <div class="brand-nav">
+    <a href="index.html" class="bnav-home">&#8592; Dashboard</a>
+    <div class="bnav-row">
+      <a href="curriculum.html" class="bnav-tool">Curriculum</a>
+      <a href="schedule.html" class="bnav-tool">Scheduler</a>
+      <a href="lesson-plan.html" class="bnav-tool active">Lesson Plan</a>
+    </div>
   </div>
 </div>
 

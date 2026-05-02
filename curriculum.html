@@ -601,7 +601,7 @@ const GH_RAW=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH
 const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 let ghSyncTimer=null;
 
-function getToken(){try{return localStorage.getItem('gh_token')||'';}catch(e){return '';}}
+function getToken(){try{return localStorage.getItem('gh_pat')||'';}catch(e){return '';}}
 
 function openGhModal(){
   document.getElementById('gh-token-input').value=getToken();
@@ -611,13 +611,13 @@ function openGhModal(){
 function saveGhToken(){
   const t=document.getElementById('gh-token-input').value.trim();
   if(!t){document.getElementById('gh-token-input').focus();return;}
-  try{localStorage.setItem('gh_token',t);}catch(e){}
+  try{localStorage.setItem('gh_pat',t);}catch(e){}
   closeModal('gh-modal');
   updateGhStatus('connected');
   toast('GitHub connected — changes will sync automatically');
 }
 function clearGhToken(){
-  try{localStorage.removeItem('gh_token');}catch(e){}
+  try{localStorage.removeItem('gh_pat');}catch(e){}
   closeModal('gh-modal');
   updateGhStatus('');
   toast('GitHub disconnected');

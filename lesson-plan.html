@@ -171,6 +171,27 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
   <span class="tool-label">Classes</span>
   <div class="chips-row" id="class-chips"></div>
   <button class="btn sec" onclick="openManage()">&#9998; Edit Classes</button>
+  <div class="vdiv"></div>
+  <button class="btn" id="gh-btn" onclick="openGhModal()" title="GitHub sync">&#9729; Sync</button>
+  <span id="gh-status" style="font-size:10px;color:var(--muted);white-space:nowrap;"></span>
+</div>
+
+<!-- GITHUB SYNC MODAL -->
+<div class="overlay" id="gh-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:10px;padding:20px 24px;min-width:300px;max-width:440px;width:92%;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);margin-bottom:12px;">&#9729; GitHub Sync</h3>
+    <p style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:12px;">Connect a GitHub token so every change syncs to the shared repo automatically. All team members will see updates when they open the page.</p>
+    <div style="margin-bottom:11px;">
+      <label style="display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Personal Access Token</label>
+      <input type="password" id="gh-token-input" placeholder="ghp_…" autocomplete="off" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);">
+    </div>
+    <p style="font-size:9.5px;color:var(--muted);line-height:1.7;margin-bottom:14px;">GitHub &rarr; Settings &rarr; Developer settings &rarr; Fine-grained tokens.<br>Permission: <em>Contents &rarr; Read &amp; Write</em> on <em>avatarmath-llc / curriculum-planning-tool</em>.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn sec" style="color:#d42b20;border-color:#d42b20" onclick="clearGhPat()">Disconnect</button>
+      <button class="btn sec" onclick="document.getElementById('gh-overlay').style.display='none'">Cancel</button>
+      <button class="btn" onclick="saveGhPat()">Connect</button>
+    </div>
+  </div>
 </div>
 
 <!-- TABLE -->
@@ -243,18 +264,53 @@ function save(){
 }
 async function ghSync(){
   const pat=localStorage.getItem('gh_pat');if(!pat)return;
+  updateGhStatus('saving');
   try{
     let sha;const r=await fetch(GH_API,{headers:{Authorization:'token '+pat}});
     if(r.ok)sha=(await r.json()).sha;
     const content=btoa(unescape(encodeURIComponent(JSON.stringify(pack(),null,2))));
-    await fetch(GH_API,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json'},
+    const res=await fetch(GH_API,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json'},
       body:JSON.stringify({sha,message:'Update lesson plan',content})});
-  }catch(e){}
+    if(res.ok){updateGhStatus('saved');setTimeout(()=>updateGhStatus('connected'),2500);}
+    else updateGhStatus('error');
+  }catch(e){updateGhStatus('error');}
+}
+function openGhModal(){
+  document.getElementById('gh-token-input').value=localStorage.getItem('gh_pat')||'';
+  const ov=document.getElementById('gh-overlay');
+  ov.style.display='flex';
+  setTimeout(()=>document.getElementById('gh-token-input').focus(),60);
+}
+function saveGhPat(){
+  const t=document.getElementById('gh-token-input').value.trim();
+  if(!t){document.getElementById('gh-token-input').focus();return;}
+  try{localStorage.setItem('gh_pat',t);}catch(e){}
+  document.getElementById('gh-overlay').style.display='none';
+  updateGhStatus('connected');
+  toast('GitHub connected — changes will sync automatically');
+}
+function clearGhPat(){
+  try{localStorage.removeItem('gh_pat');}catch(e){}
+  document.getElementById('gh-overlay').style.display='none';
+  updateGhStatus('');
+  toast('GitHub disconnected');
+}
+function updateGhStatus(state){
+  const btn=document.getElementById('gh-btn');
+  const lbl=document.getElementById('gh-status');
+  if(!btn||!lbl)return;
+  if(state==='connected'){lbl.textContent='✓ synced';lbl.style.color='#3a8f2a';}
+  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='';}
+  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='#3a8f2a';}
+  else if(state==='error'){lbl.textContent='⚠ sync failed';lbl.style.color='#d42b20';}
+  else{lbl.textContent='';}
 }
 async function init(){
   const loc=localStorage.getItem('alc_lesson_v1');
   if(loc){try{unpack(JSON.parse(loc));}catch(e){}}
   render();
+  if(localStorage.getItem('gh_pat'))updateGhStatus('connected');
+  document.getElementById('gh-overlay').addEventListener('click',e=>{if(e.target.id==='gh-overlay')e.target.style.display='none';});
   try{
     const r=await fetch(GH_RAW+'?t='+Date.now());
     if(r.ok){unpack(await r.json());save();render();}

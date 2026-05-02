@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesson Planner — Avatar Learning Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --primary:#2E68A1;--primary-lt:#5AACCF;
+  --bg:#f4f7fb;--surface:#fff;--surface2:#e8f0f8;
+  --border:#c2d8ee;--border2:#5AACCF;
+  --ink:#1a2c40;--muted:#6a8aab;
+  --sem-stripe:#f0f5fb;
+}
+body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+/* ── BRAND BAR ── */
+.brand-bar{background:linear-gradient(120deg,#19416f 0%,#2d67a0 55%,#3a7ab8 100%);padding:8px 20px;display:flex;align-items:center;gap:14px;border-bottom:4px solid #c9a83c;box-shadow:0 3px 12px rgba(0,0,0,.35);}
+.brand-icon-wrap{width:50px;height:50px;overflow:hidden;border-radius:7px;box-shadow:0 2px 10px rgba(0,0,0,.35);flex-shrink:0;}
+.brand-icon-wrap img{height:91px;width:auto;display:block;margin-top:-9px;margin-left:-16px;}
+.brand-spacer{flex:1;}
+.brand-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:white;letter-spacing:.04em;text-align:center;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.2);white-space:nowrap;}
+.brand-sub{display:block;font-size:.6rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.65);letter-spacing:.1em;margin-top:3px;text-transform:uppercase;}
+.brand-sep{font-size:.85rem;color:#c9a83c;vertical-align:middle;}
+
+/* ── TOOLBAR ── */
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tool-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.chips-row{display:flex;gap:5px;flex-wrap:wrap;}
+.class-chip{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:10px;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.chip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.btn{padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:var(--primary);color:white;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:background .15s;white-space:nowrap;}
+.btn:hover{background:#1a4a7a;}
+.btn.sec{background:var(--surface);color:var(--ink);border-color:var(--border);}
+.btn.sec:hover{background:var(--surface2);}
+.btn.danger{background:#d42b20;border-color:#d42b20;}
+.btn.danger:hover{background:#a81e16;}
+.vdiv{width:1px;height:22px;background:var(--border);flex-shrink:0;}
+
+/* ── TABLE WRAP ── */
+.table-outer{padding:0 0 40px;overflow-x:auto;}
+.plan-table{border-collapse:collapse;min-width:600px;width:100%;table-layout:fixed;}
+
+/* ── HEADER ── */
+.plan-table thead th{background:var(--surface);position:sticky;top:0;z-index:10;border-bottom:2px solid var(--border);padding:0;}
+.week-th{width:54px;min-width:54px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;padding:8px 4px;border-right:2px solid var(--border);}
+.class-th{text-align:center;vertical-align:bottom;padding:0;position:relative;border-right:1px solid var(--border);}
+.class-th-inner{display:flex;flex-direction:column;align-items:center;padding:6px 8px 8px;gap:2px;}
+.class-name{font-size:11px;font-weight:600;color:var(--ink);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.class-color-bar{height:3px;width:100%;position:absolute;top:0;left:0;border-radius:0;}
+
+/* ── SEMESTER LABEL ROWS ── */
+tr.sem-row td{background:linear-gradient(90deg,#19416f,#2d67a0);color:white;font-size:9px;letter-spacing:.18em;text-transform:uppercase;text-align:center;padding:5px 4px;font-weight:600;}
+
+/* ── WEEK ROWS ── */
+tr.week-row{height:52px;}
+tr.week-row:hover td{background:#f5f8fd;}
+tr.week-row td{vertical-align:top;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
+tr.sem2-start td{border-top:3px solid var(--primary);}
+
+.week-num{width:54px;min-width:54px;text-align:center;font-size:10px;color:var(--muted);font-weight:600;padding:8px 4px;border-right:2px solid var(--border);vertical-align:middle;}
+tr.week-row:nth-child(even) td{background:var(--sem-stripe);}
+tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
+
+/* ── PLAN CELLS ── */
+.plan-cell{cursor:pointer;padding:5px 7px;min-height:52px;transition:background .1s;position:relative;}
+.plan-cell:hover{background:rgba(90,172,207,.1)!important;}
+.plan-cell:hover::after{content:'+';position:absolute;top:4px;right:5px;font-size:12px;color:var(--border2);opacity:.7;}
+.plan-cell.has-content:hover::after{content:none;}
+.cell-topic{font-size:10px;font-weight:600;color:var(--ink);line-height:1.35;word-break:break-word;}
+.cell-sub{font-size:9px;color:var(--muted);font-style:italic;margin-top:2px;line-height:1.3;word-break:break-word;}
+
+/* ── CELL EDITOR POPOVER ── */
+#cell-editor{display:none;position:fixed;z-index:300;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;width:240px;box-shadow:0 6px 24px rgba(0,0,0,.25);}
+#cell-editor.open{display:block;}
+#cell-editor .ce-label{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+#cell-editor input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);background:var(--surface);margin-bottom:8px;}
+#cell-editor input:focus{outline:none;border-color:var(--border2);}
+#cell-editor .ce-week{font-size:9px;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.ce-acts{display:flex;gap:6px;justify-content:flex-end;margin-top:4px;}
+.ce-acts button{padding:4px 10px;border-radius:5px;border:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;}
+.ce-acts .save{background:var(--primary);color:white;border-color:var(--primary);}
+.ce-acts .save:hover{background:#1a4a7a;}
+.ce-acts .cancel{background:var(--surface2);color:var(--ink);}
+.ce-acts .clear{background:none;color:#d42b20;border-color:#d42b20;margin-right:auto;}
+
+/* ── MANAGE LIST ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:10px;padding:20px 24px;min-width:300px;max-width:440px;width:92%;box-shadow:0 8px 40px rgba(0,0,0,.3);}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);margin-bottom:14px;}
+.manage-list{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.manage-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);}
+.manage-item input[type=text]{flex:1;border:none;background:transparent;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink);outline:none;}
+.manage-item input[type=text]:focus{background:white;border-radius:3px;padding:1px 4px;}
+.del-btn{background:none;border:none;color:#d42b20;cursor:pointer;font-size:14px;flex-shrink:0;}
+.del-btn:hover{color:#a81e16;}
+.modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2c40;color:white;padding:8px 18px;border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;z-index:600;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- BRAND BAR -->
+<div class="brand-bar">
+  <div class="brand-icon-wrap">
+    <img src="Avatar Logo.svg" alt="Avatar Learning Center">
+  </div>
+  <div class="brand-spacer"></div>
+  <div class="brand-title">
+    Avatar Learning Center &nbsp;<span class="brand-sep">◆</span>&nbsp; Lesson Planner
+    <span class="brand-sub">34-Week Pacing Guide</span>
+  </div>
+  <div class="brand-spacer"></div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <span class="tool-label">Classes</span>
+  <div class="chips-row" id="class-chips"></div>
+  <button class="btn sec" onclick="openManage()">&#9998; Edit Classes</button>
+</div>
+
+<!-- TABLE -->
+<div class="table-outer">
+  <table class="plan-table" id="plan-table">
+    <thead id="plan-thead"></thead>
+    <tbody id="plan-tbody"></tbody>
+  </table>
+</div>
+
+<!-- CELL EDITOR -->
+<div id="cell-editor">
+  <div class="ce-week" id="ce-week"></div>
+  <div class="ce-label">Topic</div>
+  <input id="ce-topic" type="text" placeholder="e.g. Linear Equations" autocomplete="off">
+  <div class="ce-label">Subtopic</div>
+  <input id="ce-subtopic" type="text" placeholder="e.g. Solving one-variable" autocomplete="off">
+  <div class="ce-acts">
+    <button class="clear" onclick="clearCell()">Clear</button>
+    <button class="cancel" onclick="closeEditor()">Cancel</button>
+    <button class="save" onclick="saveCell()">Save</button>
+  </div>
+</div>
+
+<!-- MANAGE CLASSES MODAL -->
+<div class="overlay" id="manage-overlay">
+  <div class="modal">
+    <h3>Manage Classes</h3>
+    <div class="manage-list" id="manage-list"></div>
+    <button class="btn sec" style="width:100%" onclick="addClassRow()">+ Add Class</button>
+    <div class="modal-acts">
+      <button class="btn sec" onclick="closeManage()">Cancel</button>
+      <button class="btn" onclick="saveClasses()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const WEEKS=34, SEM2_START=18;
+const PALETTE=['#2E68A1','#3a8f2a','#d42b20','#c49a00','#7b3fa0','#d4620a','#1a8a8a','#c44a8a','#557a00','#1a6a6a'];
+
+let classes=[
+  {id:1,name:'Math 1A',color:'#2E68A1'},
+  {id:2,name:'Math 1B',color:'#3a8f2a'},
+];
+let cells={};
+let nextCid=3;
+
+// GitHub sync
+const GH_OWNER='avatarmath-llc',GH_REPO='curriculum-planning-tool',GH_FILE='lesson-data.json';
+const GH_RAW=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE}`;
+const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+let ghTimer=null;
+
+function pack(){return{classes,cells,nextCid};}
+function unpack(d){
+  if(!d)return;
+  if(d.classes)classes=d.classes;
+  if(d.cells)cells=d.cells;
+  if(d.nextCid)nextCid=d.nextCid;
+}
+function save(){
+  try{localStorage.setItem('alc_lesson_v1',JSON.stringify(pack()));}catch(e){}
+  clearTimeout(ghTimer);ghTimer=setTimeout(ghSync,600);
+}
+async function ghSync(){
+  const pat=localStorage.getItem('gh_pat');if(!pat)return;
+  try{
+    let sha;const r=await fetch(GH_API,{headers:{Authorization:'token '+pat}});
+    if(r.ok)sha=(await r.json()).sha;
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(pack(),null,2))));
+    await fetch(GH_API,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json'},
+      body:JSON.stringify({sha,message:'Update lesson plan',content})});
+  }catch(e){}
+}
+async function init(){
+  const loc=localStorage.getItem('alc_lesson_v1');
+  if(loc){try{unpack(JSON.parse(loc));}catch(e){}}
+  render();
+  try{
+    const r=await fetch(GH_RAW+'?t='+Date.now());
+    if(r.ok){unpack(await r.json());save();render();}
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function render(){renderChips();renderTable();}
+
+function renderChips(){
+  document.getElementById('class-chips').innerHTML=
+    classes.map(c=>`<div class="class-chip"><div class="chip-dot" style="background:${c.color}"></div>${esc(c.name)}</div>`).join('');
+}
+
+function renderTable(){
+  // Header
+  let thead=`<tr><th class="week-th">Week</th>`;
+  classes.forEach(c=>{
+    thead+=`<th class="class-th">
+      <div class="class-color-bar" style="background:${c.color}"></div>
+      <div class="class-th-inner"><span class="class-name">${esc(c.name)}</span></div>
+    </th>`;
+  });
+  thead+=`</tr>`;
+  document.getElementById('plan-thead').innerHTML=thead;
+
+  // Body
+  let tbody='';
+  for(let w=1;w<=WEEKS;w++){
+    // Semester label row
+    if(w===1) tbody+=semRow('Semester 1 — Weeks 1–17',classes.length);
+    if(w===SEM2_START) tbody+=semRow('Semester 2 — Weeks 18–34',classes.length);
+
+    const rowClass='week-row'+(w===SEM2_START?' sem2-start':'');
+    tbody+=`<tr class="${rowClass}"><td class="week-num">${w}</td>`;
+    classes.forEach(c=>{
+      const k=cellKey(w,c.id);
+      const cell=cells[k];
+      const hasCnt=cell?.topic?'has-content':'';
+      tbody+=`<td class="plan-cell ${hasCnt}" onclick="openEditor(event,${w},${c.id})" data-w="${w}" data-cid="${c.id}">`;
+      if(cell?.topic) tbody+=`<div class="cell-topic">${esc(cell.topic)}</div>`;
+      if(cell?.subtopic) tbody+=`<div class="cell-sub">${esc(cell.subtopic)}</div>`;
+      tbody+=`</td>`;
+    });
+    tbody+=`</tr>`;
+  }
+  document.getElementById('plan-tbody').innerHTML=tbody;
+}
+
+function semRow(label,numCols){
+  return`<tr class="sem-row"><td colspan="${numCols+1}">${label}</td></tr>`;
+}
+
+function cellKey(w,cid){return`${w}-${cid}`;}
+
+// ══════════════════════════════════════════
+// CELL EDITOR
+// ══════════════════════════════════════════
+let activeKey=null,activeW=null,activeCid=null;
+
+function openEditor(e,w,cid){
+  e.stopPropagation();
+  activeW=w;activeCid=cid;activeKey=cellKey(w,cid);
+  const cell=cells[activeKey]||{};
+  const cls=classes.find(c=>c.id===cid);
+  const sem=w<SEM2_START?1:2;
+
+  document.getElementById('ce-week').textContent=`${cls?.name||''} — Week ${w} (Sem ${sem})`;
+  document.getElementById('ce-topic').value=cell.topic||'';
+  document.getElementById('ce-subtopic').value=cell.subtopic||'';
+
+  // Position near cell
+  const ed=document.getElementById('cell-editor');
+  ed.classList.add('open');
+  const rect=e.currentTarget.getBoundingClientRect();
+  const edW=244,edH=180;
+  let left=rect.left+window.scrollX;
+  let top=rect.bottom+window.scrollY+4;
+  if(left+edW>window.innerWidth-8)left=window.innerWidth-edW-8;
+  if(top+edH>window.innerHeight+window.scrollY-8)top=rect.top+window.scrollY-edH-4;
+  ed.style.left=Math.max(4,left)+'px';
+  ed.style.top=Math.max(4,top)+'px';
+
+  setTimeout(()=>document.getElementById('ce-topic').focus(),30);
+}
+
+function closeEditor(){
+  document.getElementById('cell-editor').classList.remove('open');
+  activeKey=null;
+}
+
+function saveCell(){
+  if(!activeKey)return;
+  const topic=document.getElementById('ce-topic').value.trim();
+  const subtopic=document.getElementById('ce-subtopic').value.trim();
+  if(topic||subtopic){
+    cells[activeKey]={topic,subtopic};
+  }else{
+    delete cells[activeKey];
+  }
+  closeEditor();save();render();
+}
+
+function clearCell(){
+  if(!activeKey)return;
+  delete cells[activeKey];
+  closeEditor();save();render();
+}
+
+// Close on Enter in subtopic
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('cell-editor').classList.contains('open'))return;
+  if(e.key==='Enter')saveCell();
+  if(e.key==='Escape')closeEditor();
+});
+document.addEventListener('click',e=>{
+  if(!document.getElementById('cell-editor').classList.contains('open'))return;
+  if(!document.getElementById('cell-editor').contains(e.target))closeEditor();
+});
+
+// ══════════════════════════════════════════
+// MANAGE CLASSES
+// ══════════════════════════════════════════
+let tmpCls=[];
+
+function openManage(){
+  tmpCls=classes.map(c=>({...c}));
+  renderManageList();
+  document.getElementById('manage-overlay').classList.add('open');
+}
+function closeManage(){document.getElementById('manage-overlay').classList.remove('open');}
+
+function renderManageList(){
+  document.getElementById('manage-list').innerHTML=tmpCls.map((c,i)=>`
+    <div class="manage-item">
+      <input type="color" value="${c.color}" style="width:28px;height:28px;border:none;cursor:pointer;border-radius:50%;padding:0;background:none;flex-shrink:0"
+        oninput="tmpCls[${i}].color=this.value">
+      <input type="text" value="${esc(c.name)}" oninput="tmpCls[${i}].name=this.value" placeholder="Class name">
+      <button class="del-btn" onclick="tmpCls.splice(${i},1);renderManageList()">&#10005;</button>
+    </div>`).join('');
+}
+
+function addClassRow(){
+  tmpCls.push({id:nextCid++,name:'New Class',color:PALETTE[tmpCls.length%PALETTE.length]});
+  renderManageList();
+}
+
+function saveClasses(){
+  classes=tmpCls.filter(c=>c.name.trim());
+  closeManage();save();render();
+}
+
+document.getElementById('manage-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('manage-overlay'))closeManage();
+});
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let toastT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+
+init();
+</script>
+</body>
+</html>

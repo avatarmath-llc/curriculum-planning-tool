@@ -122,7 +122,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .domain-chip.selected{background:var(--domain-chip-sel);color:white;border-color:var(--domain-chip-sel);}
 
 /* Search */
-.search-wrap{position:relative;flex:1;min-width:160px;max-width:280px;}
+.search-wrap{position:relative;min-width:160px;max-width:280px;}
 .search-wrap input{width:100%;padding:5px 10px 5px 28px;border-radius:16px;border:1px solid var(--border2);background:var(--search-bg);color:var(--ink);font-family:'DM Mono',monospace;font-size:11px;outline:none;transition:border-color .15s;}
 .search-wrap input:focus{border-color:var(--primary-lt);}
 .search-wrap::before{content:'⌕';position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
@@ -335,6 +335,10 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <button class="btn btn-y" onclick="openExport()">Export JSON</button>
   <button class="btn btn-y" onclick="printView()">&#128438; Print</button>
   <button class="btn btn-r" onclick="resetToDefault()">Reset</button>
+  <div class="search-wrap" style="margin-left:auto">
+    <input type="text" id="search-input" placeholder="e.g. fractions, slope…" oninput="applyFilters()">
+  </div>
+  <span id="filter-count" style="font-size:10px;color:var(--muted);white-space:nowrap;"></span>
 </div>
 
 <!-- FILTER BAR -->
@@ -355,14 +359,6 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <div class="filter-row">
     <span class="filter-label">Domains</span>
     <div class="domain-chips" id="domain-chips"></div>
-  </div>
-  <!-- Row 3: Search -->
-  <div class="filter-row">
-    <span class="filter-label">Search</span>
-    <div class="search-wrap">
-      <input type="text" id="search-input" placeholder="e.g. fractions, slope…" oninput="applyFilters()">
-    </div>
-    <span id="filter-count" style="font-size:10px;color:var(--muted);"></span>
   </div>
 </div>
 

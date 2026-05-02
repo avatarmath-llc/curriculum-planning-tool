@@ -958,11 +958,17 @@ function reorderTopics(di,fromTi,targetTi,before){
 function setupDragAndDrop(){
   const tbody=document.getElementById('tbody');
   let dragRow=null,dragType=null,dragDi=null,dragTi=null;
+  let allowDrag=false;
+
+  // Track whether the mousedown originated on a handle
+  tbody.addEventListener('mousedown',e=>{
+    allowDrag=!!e.target.closest('.drag-handle');
+  });
 
   tbody.addEventListener('dragstart',e=>{
-    const handle=e.target.closest('.drag-handle');
-    if(!handle){e.preventDefault();return;}
-    dragRow=e.target.closest('tr');
+    if(!allowDrag){e.preventDefault();return;}
+    // e.target is the tr (the draggable element), not the clicked child
+    dragRow=e.target.matches('tr')?e.target:e.target.closest('tr');
     if(!dragRow){e.preventDefault();return;}
     dragType=dragRow.classList.contains('domain-row')?'domain':'topic';
     dragDi=parseInt(dragRow.dataset.di);

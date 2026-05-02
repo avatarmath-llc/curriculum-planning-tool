@@ -163,6 +163,15 @@ tr.domain-row td{padding:12px 8px 4px;font-family:'Playfair Display',serif;font-
 .domain-acts{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
 .icon-btn{width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,.15);border:none;color:white;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:background .12s;}
 .icon-btn:hover{background:rgba(255,255,255,.3);}
+.drag-handle{display:inline-flex;align-items:center;justify-content:center;width:16px;height:20px;margin-right:4px;cursor:grab;color:rgba(255,255,255,.45);font-size:13px;vertical-align:middle;flex-shrink:0;user-select:none;}
+.drag-handle:active{cursor:grabbing;}
+tr.topic-row .drag-handle{color:var(--muted);font-size:12px;opacity:0;transition:opacity .15s;}
+tr.topic-row:hover .drag-handle{opacity:1;}
+tr.row-dragging{opacity:.35;}
+tr.drop-above td:first-child{box-shadow:inset 0 3px 0 0 var(--primary-lt);}
+tr.drop-below td:first-child{box-shadow:inset 0 -3px 0 0 var(--primary-lt);}
+tr.domain-row.drop-above td{box-shadow:inset 0 3px 0 0 rgba(255,255,255,.6);}
+tr.domain-row.drop-below td{box-shadow:inset 0 -3px 0 0 rgba(255,255,255,.6);}
 
 tr.topic-row{border-bottom:1px solid var(--row-border);transition:background .1s,opacity .2s;}
 tr.topic-row:hover{background:var(--row-hover);}
@@ -856,11 +865,12 @@ function buildTable(){
   domains.forEach((domain,di)=>{
     const drow=document.createElement('tr');
     drow.className='domain-row';
+    drow.draggable=true;
     drow.dataset.di=di;
     const dtd=document.createElement('td');
     dtd.colSpan=14;
     dtd.style.cssText=`background:${domain.color};border-bottom-color:${domain.color}`;
-    dtd.innerHTML=`${esc(domain.name)}<span class="domain-acts">
+    dtd.innerHTML=`<span class="drag-handle" title="Drag to reorder">&#8942;</span>${esc(domain.name)}<span class="domain-acts">
       <button class="icon-btn" title="Edit domain" onclick="openEditDomain(${di})">&#9998;</button>
       <button class="icon-btn" title="Add topic here" onclick="openAddTopicTo(${di})">+</button>
       <button class="icon-btn" title="Delete domain" onclick="confirmDel('domain',${di},-1)">&#10005;</button>
@@ -871,9 +881,10 @@ function buildTable(){
     domain.topics.forEach((topic,ti)=>{
       const tr=document.createElement('tr');
       tr.className='topic-row';
+      tr.draggable=true;
       tr.dataset.di=di; tr.dataset.ti=ti;
       const ntd=document.createElement('td');
-      ntd.innerHTML=`<span class="t-name"><span class="t-name-text">${esc(topic.name)}</span><span class="topic-acts">
+      ntd.innerHTML=`<span class="drag-handle" title="Drag to reorder">&#8942;</span><span class="t-name"><span class="t-name-text">${esc(topic.name)}</span><span class="topic-acts">
         <button class="icon-btn" style="background:rgba(90,172,207,.2);color:var(--primary-lt)" title="Edit topic" onclick="openEditTopic(${di},${ti})">&#9998;</button>
         <button class="icon-btn" style="background:rgba(245,58,51,.2);color:#f53a33" title="Delete topic" onclick="confirmDel('topic',${di},${ti})">&#10005;</button>
       </span></span>${topic.sub?`<span class="t-sub">${esc(topic.sub)}</span>`:''}`;
@@ -895,6 +906,110 @@ function buildTable(){
   });
   rebuildDomainChips();
   applyFilters();
+}
+
+function reorderDomains(fromDi,targetDi,before){
+  if(fromDi===targetDi)return;
+  const n=domains.length;
+  const orderFinal=[];
+  for(let i=0;i<n;i++)if(i!==fromDi)orderFinal.push(i);
+  const rawTarget=before?targetDi:(targetDi+1);
+  const adjustedTarget=rawTarget>fromDi?rawTarget-1:rawTarget;
+  orderFinal.splice(adjustedTarget,0,fromDi);
+
+  const newCells={};
+  for(const key in cells){
+    const[di,ti,gi]=key.split('-').map(Number);
+    const newDi=orderFinal.indexOf(di);
+    newCells[`${newDi}-${ti}-${gi}`]=cells[key];
+  }
+  const newDomains=orderFinal.map(i=>domains[i]);
+  domains.length=0; newDomains.forEach(d=>domains.push(d));
+  for(const k in cells)delete cells[k];
+  Object.assign(cells,newCells);
+  save(); buildTable();
+}
+
+function reorderTopics(di,fromTi,targetTi,before){
+  if(fromTi===targetTi)return;
+  const topics=domains[di].topics;
+  const n=topics.length;
+  const orderFinal=[];
+  for(let i=0;i<n;i++)if(i!==fromTi)orderFinal.push(i);
+  const rawTarget=before?targetTi:(targetTi+1);
+  const adjustedTarget=rawTarget>fromTi?rawTarget-1:rawTarget;
+  orderFinal.splice(adjustedTarget,0,fromTi);
+
+  const newCells={};
+  for(const key in cells){
+    const[kdi,kti,kgi]=key.split('-').map(Number);
+    if(kdi===di){
+      const newTi=orderFinal.indexOf(kti);
+      if(newTi!==-1)newCells[`${di}-${newTi}-${kgi}`]=cells[key];
+    }else{newCells[key]=cells[key];}
+  }
+  const newTopics=orderFinal.map(i=>topics[i]);
+  domains[di].topics.length=0; newTopics.forEach(t=>domains[di].topics.push(t));
+  for(const k in cells)delete cells[k];
+  Object.assign(cells,newCells);
+  save(); buildTable();
+}
+
+function setupDragAndDrop(){
+  const tbody=document.getElementById('tbody');
+  let dragRow=null,dragType=null,dragDi=null,dragTi=null;
+
+  tbody.addEventListener('dragstart',e=>{
+    const handle=e.target.closest('.drag-handle');
+    if(!handle){e.preventDefault();return;}
+    dragRow=e.target.closest('tr');
+    if(!dragRow){e.preventDefault();return;}
+    dragType=dragRow.classList.contains('domain-row')?'domain':'topic';
+    dragDi=parseInt(dragRow.dataset.di);
+    dragTi=dragType==='topic'?parseInt(dragRow.dataset.ti):null;
+    dragRow.classList.add('row-dragging');
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain','drag');
+  });
+
+  tbody.addEventListener('dragend',()=>{
+    if(dragRow)dragRow.classList.remove('row-dragging');
+    tbody.querySelectorAll('.drop-above,.drop-below').forEach(r=>{r.classList.remove('drop-above','drop-below');});
+    dragRow=null;dragType=null;dragDi=null;dragTi=null;
+  });
+
+  tbody.addEventListener('dragover',e=>{
+    if(!dragRow)return;
+    e.preventDefault();
+    const tr=e.target.closest('tr');
+    if(!tr||tr===dragRow)return;
+    const isSameType=dragType==='domain'?tr.classList.contains('domain-row'):(tr.classList.contains('topic-row')&&parseInt(tr.dataset.di)===dragDi);
+    if(!isSameType)return;
+    tbody.querySelectorAll('.drop-above,.drop-below').forEach(r=>{r.classList.remove('drop-above','drop-below');});
+    const rect=tr.getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    tr.classList.add(e.clientY<mid?'drop-above':'drop-below');
+    e.dataTransfer.dropEffect='move';
+  });
+
+  tbody.addEventListener('dragleave',e=>{
+    const tr=e.target.closest('tr');
+    if(tr&&!tr.contains(e.relatedTarget)){tr.classList.remove('drop-above','drop-below');}
+  });
+
+  tbody.addEventListener('drop',e=>{
+    e.preventDefault();
+    if(!dragRow)return;
+    const tr=e.target.closest('tr');
+    if(!tr||tr===dragRow)return;
+    const before=tr.classList.contains('drop-above');
+    tbody.querySelectorAll('.drop-above,.drop-below').forEach(r=>{r.classList.remove('drop-above','drop-below');});
+    if(dragType==='domain'){
+      reorderDomains(dragDi,parseInt(tr.dataset.di),before);
+    }else{
+      reorderTopics(dragDi,dragTi,parseInt(tr.dataset.ti),before);
+    }
+  });
 }
 
 function renderCell(td,val){
@@ -1112,7 +1227,7 @@ async function init(){
     if(s){const p=JSON.parse(s);domains=p.domains;cells=p.cells;}
     else{domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
   }catch(e){domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
-  buildFilterBar();buildTable();
+  buildFilterBar();buildTable();setupDragAndDrop();
   if(getToken())updateGhStatus('connected');
 
   // Fetch latest shared state from GitHub in background

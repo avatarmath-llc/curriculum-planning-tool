@@ -116,9 +116,18 @@
       "startMin": 1035,
       "durationMin": 60,
       "lane": 1
+    },
+    {
+      "id": 12,
+      "day": "Monday",
+      "classId": 8,
+      "teacherId": null,
+      "startMin": 1020,
+      "durationMin": 60,
+      "lane": 2
     }
   ],
   "nextCid": 18,
   "nextTid": 2,
-  "nextSid": 12
+  "nextSid": 13
 }

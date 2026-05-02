@@ -116,6 +116,12 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
 .del-btn{background:none;border:none;color:#d42b20;cursor:pointer;font-size:14px;flex-shrink:0;}
 .del-btn:hover{color:#a81e16;}
 .modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+.field{margin-bottom:11px;}
+.field label{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.field input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-family:'DM Mono',monospace;font-size:12px;background:var(--surface);color:var(--ink);}
+.field input:focus{outline:none;border-color:var(--border2);}
+.btn.danger{background:#d42b20;border-color:#d42b20;color:white;}
+.btn.danger:hover{background:#a81e16;}
 
 /* ── TOAST ── */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a2c40;color:white;padding:8px 18px;border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;z-index:600;pointer-events:none;white-space:nowrap;}
@@ -187,18 +193,25 @@ tr.week-row:nth-child(even):hover td{background:#f0f5fb;}
 </div>
 
 <!-- GITHUB SYNC MODAL -->
-<div class="overlay" id="gh-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:10px;padding:20px 24px;min-width:300px;max-width:440px;width:92%;box-shadow:0 8px 40px rgba(0,0,0,.3);">
-    <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);margin-bottom:12px;">&#9729; GitHub Sync</h3>
-    <p style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:12px;">Connect a GitHub token so every change syncs to the shared repo automatically. All team members will see updates when they open the page.</p>
-    <div style="margin-bottom:11px;">
-      <label style="display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Personal Access Token</label>
-      <input type="password" id="gh-token-input" placeholder="ghp_…" autocomplete="off" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);">
+<div class="overlay" id="gh-overlay">
+  <div class="modal">
+    <h3>&#9729; GitHub Sync</h3>
+    <p style="font-size:11px;color:var(--muted);line-height:1.7;">Connect your GitHub account so every save pushes changes to the shared repo. Changes load automatically for all team members when they open the page.</p>
+    <div class="field">
+      <label>Personal Access Token</label>
+      <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
     </div>
-    <p style="font-size:9.5px;color:var(--muted);line-height:1.7;margin-bottom:14px;">GitHub &rarr; Settings &rarr; Developer settings &rarr; Fine-grained tokens.<br>Permission: <em>Contents &rarr; Read &amp; Write</em> on <em>avatarmath-llc / curriculum-planning-tool</em>.</p>
-    <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn sec" style="color:#d42b20;border-color:#d42b20" onclick="clearGhPat()">Disconnect</button>
-      <button class="btn sec" onclick="document.getElementById('gh-overlay').style.display='none'">Cancel</button>
+    <div style="background:var(--surface2);border-radius:6px;padding:10px 12px;font-size:10px;color:var(--muted);line-height:1.8;">
+      <strong>How to get a token:</strong><br>
+      1. GitHub.com &rarr; Settings &rarr; Developer settings<br>
+      2. Personal access tokens &rarr; Fine-grained tokens &rarr; Generate new token<br>
+      3. Repository access: <em>Only select repositories</em> &rarr; <strong>curriculum-planning-tool</strong><br>
+      4. Repository permissions: <strong>Contents &rarr; Read and Write</strong><br>
+      5. Generate token &rarr; copy &amp; paste it above
+    </div>
+    <div class="modal-acts">
+      <button class="btn danger" onclick="clearGhPat()">Disconnect</button>
+      <button class="btn sec" onclick="document.getElementById('gh-overlay').classList.remove('open')">Cancel</button>
       <button class="btn" onclick="saveGhPat()">Connect</button>
     </div>
   </div>
@@ -276,46 +289,60 @@ function save(){
   clearTimeout(ghTimer);ghTimer=setTimeout(ghSync,600);
 }
 async function ghSync(){
-  const pat=localStorage.getItem('gh_pat');if(!pat)return;
+  const pat=(localStorage.getItem('gh_pat')||'').replace(/[^\x20-\x7E]/g,'').trim();if(!pat)return;
   updateGhStatus('saving');
   try{
-    let sha;const r=await fetch(GH_API,{headers:{Authorization:'token '+pat}});
-    if(r.ok)sha=(await r.json()).sha;
+    let sha;
+    const r=await fetch(GH_API,{headers:{Authorization:'token '+pat,'Accept':'application/vnd.github+json'}});
+    if(r.ok){
+      sha=(await r.json()).sha;
+    } else if(r.status!==404){
+      const j=await r.json().catch(()=>({}));
+      return updateGhStatus('error',j.message||('HTTP '+r.status));
+    }
     const content=btoa(unescape(encodeURIComponent(JSON.stringify(pack(),null,2))));
-    const res=await fetch(GH_API,{method:'PUT',headers:{Authorization:'token '+pat,'Content-Type':'application/json'},
+    const res=await fetch(GH_API,{method:'PUT',
+      headers:{Authorization:'token '+pat,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
       body:JSON.stringify({sha,message:'Update lesson plan',content})});
     if(res.ok){updateGhStatus('saved');setTimeout(()=>updateGhStatus('connected'),2500);}
-    else updateGhStatus('error');
-  }catch(e){updateGhStatus('error');}
+    else{
+      const j=await res.json().catch(()=>({}));
+      updateGhStatus('error',j.message||('HTTP '+res.status));
+    }
+  }catch(e){updateGhStatus('error',e.message);}
 }
 function openGhModal(){
-  document.getElementById('gh-token-input').value=localStorage.getItem('gh_pat')||'';
-  const ov=document.getElementById('gh-overlay');
-  ov.style.display='flex';
+  document.getElementById('gh-token-input').value=(localStorage.getItem('gh_pat')||'').replace(/[^\x20-\x7E]/g,'').trim();
+  document.getElementById('gh-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('gh-token-input').focus(),60);
 }
 function saveGhPat(){
-  const t=document.getElementById('gh-token-input').value.trim();
+  const t=document.getElementById('gh-token-input').value.replace(/[^\x20-\x7E]/g,'').trim();
   if(!t){document.getElementById('gh-token-input').focus();return;}
   try{localStorage.setItem('gh_pat',t);}catch(e){}
-  document.getElementById('gh-overlay').style.display='none';
-  updateGhStatus('connected');
-  toast('GitHub connected — changes will sync automatically');
+  document.getElementById('gh-overlay').classList.remove('open');
+  toast('GitHub token saved — testing sync…');
+  ghSync();
 }
 function clearGhPat(){
   try{localStorage.removeItem('gh_pat');}catch(e){}
-  document.getElementById('gh-overlay').style.display='none';
+  document.getElementById('gh-overlay').classList.remove('open');
   updateGhStatus('');
   toast('GitHub disconnected');
 }
-function updateGhStatus(state){
+function updateGhStatus(state,detail=''){
   const btn=document.getElementById('gh-btn');
   const lbl=document.getElementById('gh-status');
   if(!btn||!lbl)return;
   if(state==='connected'){lbl.textContent='✓ synced';lbl.style.color='#3a8f2a';}
   else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='';}
   else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='#3a8f2a';}
-  else if(state==='error'){lbl.textContent='⚠ sync failed';lbl.style.color='#d42b20';}
+  else if(state==='error'){
+    lbl.textContent='⚠ '+(detail||'sync failed');
+    lbl.title=detail||'';
+    lbl.style.color='#d42b20';
+    if(detail)toast('Sync error: '+detail,4000);
+  }
   else{lbl.textContent='';}
 }
 async function init(){
@@ -531,7 +558,7 @@ document.getElementById('manage-overlay').addEventListener('click',e=>{
 // ══════════════════════════════════════════
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let toastT;
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+function toast(msg,dur=2200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),dur);}
 
 init();
 </script>

@@ -595,7 +595,7 @@ const GH_RAW=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH
 const GH_API=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 let ghSyncTimer=null;
 
-function getToken(){try{return localStorage.getItem('gh_pat')||'';}catch(e){return '';}}
+function getToken(){try{return(localStorage.getItem('gh_pat')||'').replace(/[^\x20-\x7E]/g,'').trim();}catch(e){return '';}}
 
 function openGhModal(){
   document.getElementById('gh-token-input').value=getToken();
@@ -603,12 +603,12 @@ function openGhModal(){
   setTimeout(()=>document.getElementById('gh-token-input').focus(),60);
 }
 function saveGhToken(){
-  const t=document.getElementById('gh-token-input').value.trim();
+  const t=document.getElementById('gh-token-input').value.replace(/[^\x20-\x7E]/g,'').trim();
   if(!t){document.getElementById('gh-token-input').focus();return;}
   try{localStorage.setItem('gh_pat',t);}catch(e){}
   closeModal('gh-modal');
-  updateGhStatus('connected');
-  toast('GitHub connected — changes will sync automatically');
+  toast('GitHub token saved — testing sync…');
+  syncToGitHub();
 }
 function clearGhToken(){
   try{localStorage.removeItem('gh_pat');}catch(e){}
@@ -616,14 +616,19 @@ function clearGhToken(){
   updateGhStatus('');
   toast('GitHub disconnected');
 }
-function updateGhStatus(state){
+function updateGhStatus(state,detail=''){
   const btn=document.getElementById('gh-btn');
   const lbl=document.getElementById('gh-status');
   if(!btn||!lbl)return;
   if(state==='connected'){btn.style.color='var(--btn-g-c)';btn.style.borderColor='var(--btn-g-bd)';lbl.textContent='✓ synced';lbl.style.color='var(--btn-g-c)';}
   else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='var(--muted)';}
   else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='var(--btn-g-c)';}
-  else if(state==='error'){lbl.textContent='✕ sync failed — check token';lbl.style.color='var(--btn-r-c)';}
+  else if(state==='error'){
+    lbl.textContent='⚠ '+(detail||'sync failed');
+    lbl.title=detail||'';
+    lbl.style.color='var(--btn-r-c)';
+    if(detail)toast('Sync error: '+detail,4000);
+  }
   else{btn.style.color='';btn.style.borderColor='';lbl.textContent=getToken()?'✓ synced':'';}
 }
 async function syncToGitHub(){
@@ -633,15 +638,23 @@ async function syncToGitHub(){
   try{
     let sha=null;
     const r=await fetch(GH_API,{headers:{Authorization:`token ${token}`,Accept:'application/vnd.github+json'}});
-    if(r.ok){sha=(await r.json()).sha;}
+    if(r.ok){
+      sha=(await r.json()).sha;
+    } else if(r.status!==404){
+      const j=await r.json().catch(()=>({}));
+      return updateGhStatus('error',j.message||('HTTP '+r.status));
+    }
     const content=JSON.stringify({domains,cells},null,2);
     const encoded=btoa(unescape(encodeURIComponent(content)));
     const body={message:'Update curriculum data',content:encoded};
     if(sha)body.sha=sha;
     const res=await fetch(GH_API,{method:'PUT',headers:{Authorization:`token ${token}`,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
     if(res.ok){updateGhStatus('saved');setTimeout(()=>updateGhStatus('connected'),2500);}
-    else{updateGhStatus('error');}
-  }catch(e){updateGhStatus('error');}
+    else{
+      const j=await res.json().catch(()=>({}));
+      updateGhStatus('error',j.message||('HTTP '+res.status));
+    }
+  }catch(e){updateGhStatus('error',e.message);}
 }
 
 /* ══ SAVE ══ */
@@ -1086,9 +1099,9 @@ function updateGradeIndicator(){
 
 /* ══ TOAST ══ */
 let toastTimer;
-function toast(msg){
+function toast(msg,dur=1600){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1600);
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),dur);
 }
 
 /* ══ INIT ══ */

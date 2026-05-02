@@ -219,14 +219,21 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 <div class="overlay" id="gh-overlay">
   <div class="modal">
     <h3>&#9729; GitHub Sync</h3>
-    <p style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:12px;">Connect a GitHub token so every change syncs to the shared repo automatically. All team members will see updates when they open the page.</p>
+    <p style="font-size:11px;color:var(--muted);line-height:1.7;">Connect your GitHub account so every save pushes changes to the shared repo. Changes load automatically for all team members when they open the page.</p>
     <div class="field">
       <label>Personal Access Token</label>
-      <input type="password" id="gh-token-input" placeholder="ghp_…" autocomplete="off">
+      <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
     </div>
-    <p style="font-size:9.5px;color:var(--muted);line-height:1.7;">GitHub &rarr; Settings &rarr; Developer settings &rarr; Fine-grained tokens.<br>Permission: <em>Contents &rarr; Read &amp; Write</em> on <em>avatarmath-llc / curriculum-planning-tool</em>.</p>
+    <div style="background:var(--surface2);border-radius:6px;padding:10px 12px;font-size:10px;color:var(--muted);line-height:1.8;">
+      <strong>How to get a token:</strong><br>
+      1. GitHub.com &rarr; Settings &rarr; Developer settings<br>
+      2. Personal access tokens &rarr; Fine-grained tokens &rarr; Generate new token<br>
+      3. Repository access: <em>Only select repositories</em> &rarr; <strong>curriculum-planning-tool</strong><br>
+      4. Repository permissions: <strong>Contents &rarr; Read and Write</strong><br>
+      5. Generate token &rarr; copy &amp; paste it above
+    </div>
     <div class="modal-acts">
-      <button class="btn sec" style="color:#d42b20;border-color:#d42b20" onclick="clearGhPat()">Disconnect</button>
+      <button class="btn danger" onclick="clearGhPat()">Disconnect</button>
       <button class="btn sec" onclick="document.getElementById('gh-overlay').classList.remove('open')">Cancel</button>
       <button class="btn" onclick="saveGhPat()">Connect</button>
     </div>

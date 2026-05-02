@@ -67,6 +67,10 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .bnav-tool{padding:3px 9px;border-radius:5px;font-size:9px;text-decoration:none;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
 .bnav-tool:hover{background:rgba(255,255,255,.15);color:white;}
 .bnav-tool.active{background:rgba(255,255,255,.22);color:white;border:1px solid rgba(255,255,255,.35);}
+.bnav-sep{width:1px;height:12px;background:rgba(255,255,255,.2);display:inline-block;align-self:center;margin:0 2px;flex-shrink:0;}
+.bnav-sync{padding:3px 9px;border-radius:5px;font-size:9px;border:1px solid rgba(255,255,255,.25);background:none;cursor:pointer;font-family:'DM Mono',monospace;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
+.bnav-sync:hover{background:rgba(255,255,255,.15);color:white;}
+.bnav-sync-status{font-size:9px;white-space:nowrap;letter-spacing:.04em;color:rgba(255,255,255,.5);}
 .brand-logo{width:40px;height:40px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--primary);flex-shrink:0;letter-spacing:-1px;}
 .brand-name{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:white;line-height:1.15;}
 .brand-name span{display:block;font-size:.65rem;font-weight:400;font-style:italic;color:rgba(255,255,255,.7);letter-spacing:.06em;margin-top:1px;}
@@ -306,6 +310,9 @@ footer a{color:var(--primary-lt);text-decoration:none;}
       <a href="curriculum.html" class="bnav-tool active">Curriculum</a>
       <a href="schedule.html" class="bnav-tool">Scheduler</a>
       <a href="lesson-plan.html" class="bnav-tool">Lesson Plan</a>
+      <span class="bnav-sep"></span>
+      <button class="bnav-sync" id="gh-btn" onclick="openGhModal()" title="GitHub sync">&#9729; Sync</button>
+      <span id="gh-status" class="bnav-sync-status"></span>
     </div>
   </div>
 </div>
@@ -316,6 +323,7 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <a href="curriculum.html" class="active">Curriculum</a>
   <a href="schedule.html">Scheduler</a>
   <a href="lesson-plan.html">Lesson Plan</a>
+  <a href="#" onclick="openGhModal();return false;">&#9729; Sync</a>
 </div>
 
 <!-- TOOLBAR -->
@@ -327,9 +335,6 @@ footer a{color:var(--primary-lt);text-decoration:none;}
   <button class="btn btn-y" onclick="openExport()">Export JSON</button>
   <button class="btn btn-y" onclick="printView()">&#128438; Print</button>
   <button class="btn btn-r" onclick="resetToDefault()">Reset</button>
-  <div class="t-sep"></div>
-  <button class="btn" id="gh-btn" onclick="openGhModal()" title="Configure GitHub sync">&#9729; Sync</button>
-  <span id="gh-status" style="font-size:10px;color:var(--muted);white-space:nowrap;"></span>
 </div>
 
 <!-- FILTER BAR -->
@@ -617,19 +622,18 @@ function clearGhToken(){
   toast('GitHub disconnected');
 }
 function updateGhStatus(state,detail=''){
-  const btn=document.getElementById('gh-btn');
   const lbl=document.getElementById('gh-status');
-  if(!btn||!lbl)return;
-  if(state==='connected'){btn.style.color='var(--btn-g-c)';btn.style.borderColor='var(--btn-g-bd)';lbl.textContent='✓ synced';lbl.style.color='var(--btn-g-c)';}
-  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='var(--muted)';}
-  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='var(--btn-g-c)';}
+  if(!lbl)return;
+  if(state==='connected'){lbl.textContent='✓ synced';lbl.style.color='rgba(110,230,110,.9)';}
+  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='rgba(255,255,255,.55)';}
+  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='rgba(110,230,110,.9)';}
   else if(state==='error'){
     lbl.textContent='⚠ '+(detail||'sync failed');
     lbl.title=detail||'';
-    lbl.style.color='var(--btn-r-c)';
+    lbl.style.color='rgba(255,110,100,.9)';
     if(detail)toast('Sync error: '+detail,4000);
   }
-  else{btn.style.color='';btn.style.borderColor='';lbl.textContent=getToken()?'✓ synced':'';}
+  else{lbl.textContent='';lbl.style.color='';}
 }
 async function syncToGitHub(){
   const token=getToken();

@@ -36,6 +36,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 .bnav-tool{padding:3px 9px;border-radius:5px;font-size:9px;text-decoration:none;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
 .bnav-tool:hover{background:rgba(255,255,255,.15);color:white;}
 .bnav-tool.active{background:rgba(255,255,255,.22);color:white;border:1px solid rgba(255,255,255,.35);}
+.bnav-sep{width:1px;height:12px;background:rgba(255,255,255,.2);display:inline-block;align-self:center;margin:0 2px;flex-shrink:0;}
+.bnav-sync{padding:3px 9px;border-radius:5px;font-size:9px;border:1px solid rgba(255,255,255,.25);background:none;cursor:pointer;font-family:'DM Mono',monospace;color:rgba(255,255,255,.6);letter-spacing:.07em;text-transform:uppercase;transition:all .15s;white-space:nowrap;}
+.bnav-sync:hover{background:rgba(255,255,255,.15);color:white;}
+.bnav-sync-status{font-size:9px;white-space:nowrap;letter-spacing:.04em;color:rgba(255,255,255,.5);}
 
 /* ── CONFIG BAR ── */
 .config-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 16px;display:flex;align-items:center;gap:16px;font-size:11px;color:var(--muted);flex-wrap:wrap;}
@@ -174,6 +178,9 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
       <a href="curriculum.html" class="bnav-tool">Curriculum</a>
       <a href="schedule.html" class="bnav-tool active">Scheduler</a>
       <a href="lesson-plan.html" class="bnav-tool">Lesson Plan</a>
+      <span class="bnav-sep"></span>
+      <button class="bnav-sync" id="gh-btn" onclick="openGhModal()" title="GitHub sync">&#9729; Sync</button>
+      <span id="gh-status" class="bnav-sync-status"></span>
     </div>
   </div>
 </div>
@@ -184,6 +191,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
   <a href="curriculum.html">Curriculum</a>
   <a href="schedule.html" class="active">Scheduler</a>
   <a href="lesson-plan.html">Lesson Plan</a>
+  <a href="#" onclick="openGhModal();return false;">&#9729; Sync</a>
 </div>
 
 <!-- CONFIG BAR -->
@@ -210,9 +218,6 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
   <span class="tool-label">Teachers</span>
   <div class="chips-row" id="teacher-chips"></div>
   <button class="btn sec" onclick="openManageTeachers()">&#9998; Edit</button>
-  <div class="vdiv"></div>
-  <button class="btn" id="gh-btn" onclick="openGhModal()" title="GitHub sync">&#9729; Sync</button>
-  <span id="gh-status" style="font-size:10px;color:var(--muted);white-space:nowrap;"></span>
 </div>
 
 <!-- GITHUB SYNC MODAL -->
@@ -399,19 +404,18 @@ function clearGhPat(){
   toast('GitHub disconnected');
 }
 function updateGhStatus(state,detail=''){
-  const btn=document.getElementById('gh-btn');
   const lbl=document.getElementById('gh-status');
-  if(!btn||!lbl)return;
-  if(state==='connected'){lbl.textContent='✓ synced';lbl.style.color='#3a8f2a';}
-  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='';}
-  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='#3a8f2a';}
+  if(!lbl)return;
+  if(state==='connected'){lbl.textContent='✓ synced';lbl.style.color='rgba(110,230,110,.9)';}
+  else if(state==='saving'){lbl.textContent='↑ saving…';lbl.style.color='rgba(255,255,255,.55)';}
+  else if(state==='saved'){lbl.textContent='✓ saved';lbl.style.color='rgba(110,230,110,.9)';}
   else if(state==='error'){
     lbl.textContent='⚠ '+(detail||'sync failed');
     lbl.title=detail||'';
-    lbl.style.color='#d42b20';
+    lbl.style.color='rgba(255,110,100,.9)';
     if(detail)toast('Sync error: '+detail,4000);
   }
-  else{lbl.textContent='';}
+  else{lbl.textContent='';lbl.style.color='';}
 }
 async function init(){
   const loc=localStorage.getItem('alc_sched_v1');

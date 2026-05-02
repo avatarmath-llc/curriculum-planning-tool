@@ -55,8 +55,8 @@
 
 /* ══ BASE ══ */
 *{box-sizing:border-box;margin:0;padding:0;}
-html{transition:background .25s;}
-body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;min-height:100vh;transition:background .25s,color .25s;}
+html{transition:background .25s;height:100%;}
+body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;height:100%;display:flex;flex-direction:column;overflow:hidden;transition:background .25s,color .25s;}
 
 /* ══ BRAND BAR ══ */
 .brand-bar{background:linear-gradient(120deg,#19416f 0%,#2d67a0 55%,#3a7ab8 100%);padding:10px 20px;display:flex;align-items:center;gap:14px;border-bottom:4px solid #c9a83c;flex-wrap:wrap;box-shadow:0 3px 12px rgba(0,0,0,.35);position:relative;}
@@ -85,7 +85,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 .theme-btn:hover:not(.active){color:white;background:rgba(255,255,255,.12);}
 
 /* ══ TOOLBAR ══ */
-.toolbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow);transition:background .25s,border-color .25s;}
+.toolbar{z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow);transition:background .25s,border-color .25s;}
 .t-sep{width:1px;height:28px;background:var(--border);flex-shrink:0;}
 .t-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
 .pal-dot{width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white;transition:transform .12s,box-shadow .12s;user-select:none;}
@@ -145,9 +145,9 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Mono',monospace;font-
 
 
 /* ══ TABLE ══ */
-.table-wrap{overflow-x:auto;padding:12px 16px 80px;}
+.table-wrap{flex:1;min-height:0;overflow:auto;padding:0 16px 40px;}
 table{border-collapse:collapse;min-width:980px;width:100%;}
-thead th{position:sticky;top:var(--toolbar-h,44px);background:var(--thead-bg);padding:7px 3px 5px;text-align:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;z-index:10;transition:background .25s,opacity .2s;}
+thead th{position:sticky;top:0;background:var(--thead-bg);padding:7px 3px 5px;text-align:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,.08);transition:background .25s,opacity .2s;}
 thead th:first-child{text-align:left;padding-left:6px;width:420px;min-width:380px;}
 .th-sub{display:block;font-size:8px;letter-spacing:.02em;text-transform:none;font-style:italic;color:var(--primary-lt);margin-top:1px;font-weight:400;}
 th.band,td.band{border-left:1px dashed var(--border);}
@@ -254,8 +254,8 @@ function updateGradeIndicator(){
 @media print {
   .brand-bar,.toolbar,.filter-bar,.legend-bar,footer,#toast,.modal-overlay{display:none!important;}
   .print-header{display:block!important;}
-  body{background:white;color:black;font-size:10px;}
-  .table-wrap{padding:0;overflow:visible;}
+  body{background:white;color:black;font-size:10px;height:auto;overflow:visible;display:block;}
+  .table-wrap{padding:0;overflow:visible;height:auto;flex:none;}
   table{min-width:unset;width:100%;}
   thead th{background:white!important;color:#333!important;font-size:9px;}
   tr.domain-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
@@ -1225,13 +1225,6 @@ function toast(msg,dur=1600){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),dur);
 }
 
-/* ══ STICKY OFFSET ══ */
-function updateStickyOffset(){
-  const tb=document.querySelector('.toolbar');
-  if(tb)document.documentElement.style.setProperty('--toolbar-h',tb.offsetHeight+'px');
-}
-window.addEventListener('resize',updateStickyOffset);
-
 /* ══ INIT ══ */
 async function init(){
   // Load local state immediately for instant display
@@ -1240,7 +1233,7 @@ async function init(){
     if(s){const p=JSON.parse(s);domains=p.domains;cells=p.cells;}
     else{domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
   }catch(e){domains=cloneDeep(DEFAULT_DOMAINS);cells=defaultCells(domains);}
-  buildFilterBar();buildTable();setupDragAndDrop();updateStickyOffset();
+  buildFilterBar();buildTable();setupDragAndDrop();
   if(getToken())updateGhStatus('connected');
 
   // Fetch latest shared state from GitHub in background

@@ -103,7 +103,7 @@
       "id": 8,
       "day": "Tuesday",
       "classId": 3,
-      "teacherId": null,
+      "teacherId": 1,
       "startMin": 975,
       "durationMin": 60,
       "lane": 0

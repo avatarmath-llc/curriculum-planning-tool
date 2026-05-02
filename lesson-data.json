@@ -1,0 +1,86 @@
+{
+  "classes": [
+    {
+      "id": 1,
+      "name": "Math 1A",
+      "color": "#2E68A1"
+    },
+    {
+      "id": 2,
+      "name": "Math 1B",
+      "color": "#3a8f2a"
+    },
+    {
+      "id": 8,
+      "name": "Math 2A",
+      "color": "#d42b20"
+    },
+    {
+      "id": 9,
+      "name": "Math 2B",
+      "color": "#c49a00"
+    },
+    {
+      "id": 10,
+      "name": "Math 3A",
+      "color": "#7b3fa0"
+    },
+    {
+      "id": 11,
+      "name": "Math 3B",
+      "color": "#d4620a"
+    },
+    {
+      "id": 12,
+      "name": "Math 4A",
+      "color": "#1a8a8a"
+    },
+    {
+      "id": 13,
+      "name": "Math 4B",
+      "color": "#c44a8a"
+    },
+    {
+      "id": 14,
+      "name": "Math 5A",
+      "color": "#557a00"
+    },
+    {
+      "id": 15,
+      "name": "Math 5B",
+      "color": "#1a6a6a"
+    },
+    {
+      "id": 16,
+      "name": "Math 6A",
+      "color": "#2E68A1"
+    },
+    {
+      "id": 17,
+      "name": "Math 6B",
+      "color": "#3a8f2a"
+    },
+    {
+      "id": 18,
+      "name": "Pre-Alg A",
+      "color": "#d42b20"
+    },
+    {
+      "id": 19,
+      "name": "Pre-Alg B",
+      "color": "#c49a00"
+    },
+    {
+      "id": 20,
+      "name": "Alg A",
+      "color": "#7b3fa0"
+    },
+    {
+      "id": 21,
+      "name": "Geo",
+      "color": "#d4620a"
+    }
+  ],
+  "cells": {},
+  "nextCid": 22
+}

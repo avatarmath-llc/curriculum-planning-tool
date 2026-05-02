@@ -100,15 +100,6 @@
   ],
   "sessions": [
     {
-      "id": 8,
-      "day": "Tuesday",
-      "classId": 3,
-      "teacherId": 1,
-      "startMin": 975,
-      "durationMin": 60,
-      "lane": 0
-    },
-    {
       "id": 9,
       "day": "Thursday",
       "classId": 6,

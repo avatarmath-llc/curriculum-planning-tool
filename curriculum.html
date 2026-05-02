@@ -308,10 +308,6 @@ footer a{color:var(--primary-lt);text-decoration:none;}
       <a href="lesson-plan.html" class="bnav-tool">Lesson Plan</a>
     </div>
   </div>
-  <div class="theme-toggle" role="group" aria-label="Theme">
-    <button class="theme-btn" id="btn-dark" onclick="setTheme('dark')">&#9790; Dark</button>
-    <button class="theme-btn active" id="btn-light" onclick="setTheme('light')">&#9788; Light</button>
-  </div>
 </div>
 
 <!-- MOBILE NAV -->
@@ -477,8 +473,6 @@ document.getElementById('yr').textContent = new Date().getFullYear();
 /* ══ THEME ══ */
 function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('btn-dark').classList.toggle('active',t==='dark');
-  document.getElementById('btn-light').classList.toggle('active',t==='light');
   try{localStorage.setItem('alc_theme',t);}catch(e){}
 }
 (function(){try{const t=localStorage.getItem('alc_theme');if(t)setTheme(t);}catch(e){}})();

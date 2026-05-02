@@ -141,6 +141,11 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
 .dur-btn{flex:1;padding:8px 4px;border-radius:6px;border:2px solid var(--border);background:var(--surface2);color:var(--ink);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;text-align:center;transition:all .15s;}
 .dur-btn.active{border-color:var(--primary);background:var(--primary);color:white;}
 
+/* Slot counter */
+.slot-adj{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--ink);cursor:pointer;font-size:14px;line-height:1;padding:0;font-family:'DM Mono',monospace;transition:background .15s,color .15s;}
+.slot-adj:hover{background:var(--primary);color:white;border-color:var(--primary);}
+#cfg-slot-val{display:inline-block;min-width:24px;text-align:center;font-weight:600;color:var(--ink);}
+
 /* Manage list */
 .manage-list{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
 .manage-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);}
@@ -188,7 +193,11 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--ink);min-h
     <input type="time" id="cfg-end" value="20:00" onchange="applyConfig()">
   </label>
   <div class="vdiv"></div>
-  <span>15-min slots</span>
+  <label style="display:flex;align-items:center;gap:5px;white-space:nowrap;">Slot:
+    <button class="slot-adj" onclick="changeSlot(-5)">&#8722;</button>
+    <span id="cfg-slot-val">15</span> min
+    <button class="slot-adj" onclick="changeSlot(+5)">+</button>
+  </label>
 </div>
 
 <!-- TOOLBAR -->
@@ -293,7 +302,7 @@ const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunda
 const PALETTE=['#2E68A1','#3a8f2a','#d42b20','#c49a00','#7b3fa0','#d4620a','#1a8a8a','#c44a8a','#557a00','#1a6a6a'];
 const LANE_H=58, LANE_PAD=5;
 
-let cfg={startTime:'16:00',endTime:'20:00'};
+let cfg={startTime:'16:00',endTime:'20:00',slotMin:15};
 let classes=[
   {id:1,name:'Math 1A',color:'#2E68A1'},
   {id:2,name:'Math 1B',color:'#3a8f2a'},
@@ -315,8 +324,9 @@ function toMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function toTime(m){return`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;}
 function fmt(m){const h=Math.floor(m/60),mn=m%60,ap=h>=12?'PM':'AM',h12=h%12||12;return`${h12}:${String(mn).padStart(2,'0')} ${ap}`;}
 function slotInfo(){
-  const s=toMin(cfg.startTime),e=toMin(cfg.endTime),tot=e-s,n=Math.round(tot/15);
-  return{s,e,tot,n};
+  const slot=cfg.slotMin||15;
+  const s=toMin(cfg.startTime),e=toMin(cfg.endTime),tot=e-s,n=Math.round(tot/slot);
+  return{s,e,tot,n,slot};
 }
 
 // ══════════════════════════════════════════
@@ -397,6 +407,7 @@ async function init(){
 function render(){
   document.getElementById('cfg-start').value=cfg.startTime;
   document.getElementById('cfg-end').value=cfg.endTime;
+  document.getElementById('cfg-slot-val').textContent=cfg.slotMin||15;
   renderChips();
   renderGrid();
 }
@@ -412,14 +423,14 @@ function renderChips(){
 }
 
 function renderGrid(){
-  const{s:startMin,tot,n:numSlots}=slotInfo();
+  const{s:startMin,tot,n:numSlots,slot}=slotInfo();
   const grid=document.getElementById('schedule-grid');
   let html='';
 
   // ── Ruler
   html+=`<div class="ruler-row"><div style="width:var(--label-w)"></div><div class="ruler-inner" style="position:relative">`;
   for(let i=0;i<=numSlots;i++){
-    const m=startMin+i*15,isHour=m%60===0,pct=(i/numSlots*100).toFixed(3);
+    const m=startMin+i*slot,isHour=m%60===0,pct=(i/numSlots*100).toFixed(3);
     if(i<numSlots)html+=`<div class="ruler-slot${isHour?' hour':''}" style="left:${pct}%;width:${(100/numSlots).toFixed(3)}%"></div>`;
     if(isHour)html+=`<span class="ruler-label" style="left:${pct}%">${fmt(m)}</span>`;
   }
@@ -438,7 +449,7 @@ function renderGrid(){
 
     // Slot lines
     for(let i=1;i<numSlots;i++){
-      const m=startMin+i*15,isHour=m%60===0;
+      const m=startMin+i*slot,isHour=m%60===0;
       html+=`<div class="slot-line${isHour?' hour':''}" style="left:${(i/numSlots*100).toFixed(3)}%"></div>`;
     }
 
@@ -481,9 +492,9 @@ function dragStart(e,day){
   e.preventDefault();
   const cv=document.getElementById('cv-'+day);
   const rect=cv.getBoundingClientRect();
-  const{s:startMin,tot}=slotInfo();
+  const{s:startMin,tot,slot}=slotInfo();
   const pct=(e.clientX-rect.left)/rect.width;
-  const raw=Math.round(pct*tot/15)*15;
+  const raw=Math.round(pct*tot/slot)*slot;
   const clipped=Math.max(0,Math.min(raw,tot-60));
   drag={day,cv,rect,startMin:startMin+clipped,dur:60};
 
@@ -498,10 +509,10 @@ function dragStart(e,day){
 
 function dragMove(e){
   if(!drag)return;
-  const{s:startMin,tot}=slotInfo();
+  const{s:startMin,tot,slot}=slotInfo();
   const rect=drag.cv.getBoundingClientRect();
   const pct=(e.clientX-rect.left)/rect.width;
-  const curMin=startMin+Math.round(pct*tot/15)*15;
+  const curMin=startMin+Math.round(pct*tot/slot)*slot;
   const raw=curMin-drag.startMin;
   drag.dur=raw>=105?120:raw>=75?90:60;
   updatePreview();
@@ -705,14 +716,14 @@ function chipUp(){
 }
 
 function getDropTarget(x,y,durMin=60){
-  const{s:startMin,tot}=slotInfo();
+  const{s:startMin,tot,slot}=slotInfo();
   for(const day of DAYS){
     const cv=document.getElementById('cv-'+day);
     if(!cv)continue;
     const r=cv.getBoundingClientRect();
     if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom){
       const pct=(x-r.left)/r.width;
-      const raw=Math.round(pct*tot/15)*15;
+      const raw=Math.round(pct*tot/slot)*slot;
       return{day,startMin:startMin+Math.max(0,Math.min(raw,tot-durMin))};
     }
   }
@@ -783,6 +794,12 @@ function saveTeachers(){
 function applyConfig(){
   cfg.startTime=document.getElementById('cfg-start').value;
   cfg.endTime=document.getElementById('cfg-end').value;
+  save();render();
+}
+function changeSlot(delta){
+  const next=Math.max(5,Math.min(60,(cfg.slotMin||15)+delta));
+  if(next===cfg.slotMin)return;
+  cfg.slotMin=next;
   save();render();
 }
 
